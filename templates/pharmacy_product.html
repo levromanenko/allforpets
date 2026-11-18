@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} — Кабінет</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; color: #333; }
+        .topbar { background: white; border-bottom: 1px solid #e0f7fa; padding: 14px 24px; display: flex; align-items: center; gap: 14px; }
+        .logo-paw { width: 36px; height: 36px; background: #00acc1; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .app-name { font-size: 20px; font-weight: 700; color: #00838f; }
+        .container { max-width: 700px; margin: 30px auto; padding: 0 20px; }
+        .back-link { color: #00838f; text-decoration: none; font-weight: 600; }
+        .card { background: white; border-radius: 16px; padding: 24px; margin-top: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .row { display: flex; gap: 20px; }
+        .photo { width: 180px; height: 180px; border-radius: 12px; object-fit: cover; background: #e0f7fa; }
+        .info { flex: 1; }
+        .name { font-size: 22px; font-weight: 700; color: #00838f; }
+        .price { font-size: 20px; margin: 12px 0; }
+        .meta { font-size: 14px; color: #666; margin: 6px 0; }
+        .char { margin-top: 20px; }
+        .char h3 { color: #00838f; margin-bottom: 10px; }
+        .char-row { padding: 6px 0; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo-paw">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                <path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/>
+            </svg>
+        </div>
+        <div class="app-name">AllForPets</div>
+    </div>
+    <div class="container">
+        <a href="/pharmacy/cabinet" class="back-link">← Назад до кабінету</a>
+        <div class="card">
+            <div class="row">
+                {% if product.photo %}
+                <img src="{{ product.photo }}" class="photo" alt="">
+                {% else %}
+                <div class="photo" style="display:flex;align-items:center;justify-content:center;font-size:48px;">💊</div>
+                {% endif %}
+                <div class="info">
+                    <div class="name">{{ product.name }}</div>
+                    <div class="price">{{ pp.price }} грн</div>
+                    <div class="meta">Кількість: {{ pp.quantity }} шт.</div>
+                    <div class="meta">Додано: {{ pp.created_at.strftime('%d.%m.%Y') if pp.created_at else '—' }}</div>
+                </div>
+            </div>
+            <div class="char">
+                <h3>Характеристики</h3>
+                {% if product.form %}<div class="char-row">Форма: {{ product.form }}</div>{% endif %}
+                {% if product.volume %}<div class="char-row">Об'єм: {{ product.volume }}</div>{% endif %}
+                {% if product.animal_type %}<div class="char-row">Вид: {{ product.animal_type }}</div>{% endif %}
+                {% if product.weight_from or product.weight_to %}<div class="char-row">Вага: {{ product.weight_from or '—' }}–{{ product.weight_to or '—' }} кг</div>{% endif %}
+                {% if product.manufacturer %}<div class="char-row">Виробник: {{ product.manufacturer }}</div>{% endif %}
+                {% if product.description %}<div class="char-row">Опис: {{ product.description }}</div>{% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

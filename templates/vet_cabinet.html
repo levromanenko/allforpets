@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кабінет лікаря — AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f0fafa; color: #1a1a1a; }
+        header { background: #fff; padding: 10px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e6f7f7; position: sticky; top: 0; z-index: 100; height: 64px; }
+        .left { display: flex; align-items: center; gap: 20px; }
+        .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .logo-icon { width: 38px; height: 38px; background: #00a8a8; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+        .logo-text { font-weight: 700; font-size: 20px; color: #00a8a8; }
+        .city { display: flex; align-items: center; gap: 6px; color: #00a8a8; font-weight: 500; font-size: 15px; }
+        nav { display: flex; gap: 32px; }
+        nav a { color: #00a8a8; text-decoration: none; font-weight: 500; font-size: 15px; }
+        .right { display: flex; align-items: center; gap: 20px; }
+        .right a { color: #00a8a8; text-decoration: none; font-size: 22px; }
+        .container { max-width: 1000px; margin: 32px auto; padding: 0 20px; }
+        .card { background: #fff; border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(0,168,168,0.08); }
+        h2 { color: #00a8a8; margin-bottom: 20px; font-size: 24px; }
+        .nav-arrows { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .nav-arrows a { color: #00a8a8; text-decoration: none; font-size: 24px; padding: 4px 12px; }
+        .nav-arrows span { font-weight: 600; font-size: 18px; }
+        .calendar { width: 100%; border-collapse: separate; border-spacing: 8px; }
+        .calendar th { padding: 8px; color: #00a8a8; font-weight: 600; font-size: 14px; }
+        .calendar td { padding: 14px 8px; text-align: center; background: #f8fafa; border-radius: 12px; cursor: pointer; font-weight: 500; }
+        .calendar td:hover { background: #e0f7f7; }
+        .calendar .today { background: #00a8a8; color: white; }
+        #detail { margin-top: 24px; padding: 16px; background: #f8ffff; border-radius: 12px; }
+        #detail a { color: #00a8a8; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="left">
+            <a href="/" class="logo">
+                <div class="logo-icon">🐾</div>
+                <span class="logo-text">AllForPets</span>
+            </a>
+            <div class="city">📍 Київ</div>
+        </div>
+        <nav>
+            <a href="/">Головна</a>
+            <a href="/cabinet">Мої улюбленці</a>
+            <a href="/clinics">Клініки</a>
+            <a href="/search">Записатися</a>
+            <a href="/pharmacies">Ветаптеки</a>
+            <a href="/shops">Зоомагазини</a>
+        </nav>
+        <div class="right">
+            <a href="/settings">⚙️</a>
+            <a href="/logout" style="color:#e53935;font-size:15px;font-weight:600;">Вийти</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Календар записів</h2>
+            <div class="nav-arrows">
+                <a href="/vet/cabinet?year={{ prev_year }}&month={{ prev_month }}">←</a>
+                <span>{{ month_name }}</span>
+                <a href="/vet/cabinet?year={{ next_year }}&month={{ next_month }}">→</a>
+            </div>
+            <table class="calendar">
+                <tr>
+                    <th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Нд</th>
+                </tr>
+                {% for week in month_days %}
+                <tr>
+                    {% for day in week %}
+                    <td class="{% if day == today.day and month == today.month and year == today.year %}today{% endif %}" {% if day %}onclick="showDay({{ day }})"{% endif %}>
+                        {{ day if day else '' }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+            <div id="detail"></div>
+        </div>
+    </div>
+
+    <script>
+        const appointments = {{ appointments_json | safe }};
+        const year = {{ year }};
+        const month = {{ month }};
+
+        function showDay(day) {
+            const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const dayApps = appointments.filter(a => a.date === dateStr);
+            const detail = document.getElementById('detail');
+            if (dayApps.length === 0) {
+                detail.innerHTML = '<p>На цей день записів немає</p>';
+                return;
+            }
+            let html = '';
+            dayApps.forEach(app => {
+                html += `<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #e0f0f0;">
+                    <h4>${app.time || '—'} — Улюбленець</h4>
+                    <p>${app.complaint || 'Без скарги'}</p>
+                    ${app.pet_id ? `<a href="/vet/pet/${app.pet_id}?appointment_id=${app.id}">Відкрити профіль улюбленця</a>` : '<span style="color:#999;">Улюбленець не обраний</span>'}
+                </div>`;
+            });
+            detail.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

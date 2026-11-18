@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявка клініки — Адмін</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8fdfd; padding: 20px; }
+        .box { max-width: 700px; margin: 0 auto; background: white; padding: 24px; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        h2 { color: #00838f; margin-bottom: 16px; }
+        .field { margin-bottom: 12px; }
+        .label { font-weight: bold; color: #555; font-size: 14px; }
+        .value { margin-top: 4px; }
+        img { max-width: 200px; border-radius: 8px; margin-top: 6px; }
+        .btn { display: inline-block; margin-top: 16px; padding: 10px 20px; background: #00acc1; color: white; text-decoration: none; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Заявка клініки #{{ clinic.id }}</h2>
+
+        <div class="field"><div class="label">Назва</div><div class="value">{{ clinic.name }}</div></div>
+        <div class="field"><div class="label">Район</div><div class="value">{{ clinic.district or '—' }}</div></div>
+        <div class="field"><div class="label">Адреса</div><div class="value">{{ clinic.address or '—' }}</div></div>
+        <div class="field"><div class="label">Телефон рецепції</div><div class="value">{{ clinic.phone or '—' }}</div></div>
+        <div class="field"><div class="label">Телефон власника (для зв’язку)</div><div class="value">{{ clinic.owner_phone or '—' }}</div></div>
+        <div class="field"><div class="label">Пошта</div><div class="value">{{ clinic.email or '—' }}</div></div>
+        <div class="field"><div class="label">Опис</div><div class="value">{{ clinic.description or '—' }}</div></div>
+        <div class="field"><div class="label">Графік роботи</div><div class="value">{{ clinic.work_hours or '—' }}</div></div>
+        <div class="field"><div class="label">Умови прийняті</div><div class="value">{{ 'Так' if clinic.terms_accepted else 'Ні' }}</div></div>
+        <div class="field"><div class="label">Статус</div><div class="value">{{ clinic.status }}</div></div>
+
+        {% if clinic.photo %}
+        <div class="field">
+            <div class="label">Фото клініки</div>
+            <img src="{{ clinic.photo }}" alt="">
+        </div>
+        {% endif %}
+
+        {% if clinic.documents %}
+        <div class="field">
+            <div class="label">Документи</div>
+            <a href="{{ clinic.documents }}" target="_blank">Відкрити документ</a>
+        </div>
+        {% endif %}
+
+        <a href="/admin" class="btn">← Назад до адмін-панелі</a>
+    </div>
+</body>
+</html>

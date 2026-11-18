@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мої улюбленці — AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; color: #333; }
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: white; border-bottom: 1px solid #e0f7fa;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 24px; height: 64px;
+        }
+        .left-part { display: flex; align-items: center; gap: 14px; }
+        .logo-paw {
+            width: 36px; height: 36px; background: #00acc1;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+        }
+        .app-name { font-size: 20px; font-weight: 700; color: #00838f; }
+        .city { display: flex; align-items: center; gap: 6px; color: #00838f; font-weight: 600; }
+        .right-part { display: flex; align-items: center; gap: 16px; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: #00838f; text-decoration: none; }
+        .nav-top { display: flex; gap: 20px; align-items: center; }
+        .nav-top a { color: #00838f; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .nav-top a:hover { text-decoration: underline; }
+        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        h2 { color: #00838f; margin-bottom: 20px; }
+        .pet-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; gap: 16px; text-decoration: none; color: inherit; }
+        .pet-card img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: #e0f7fa; }
+        .pet-info { flex: 1; }
+        .pet-name { font-size: 18px; font-weight: 700; color: #00838f; }
+        .meta { font-size: 14px; color: #555; margin: 2px 0; }
+        .add-btn { display: inline-block; background: #00acc1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-bottom: 20px; }
+        .add-btn:hover { background: #00838f; }
+        .quick-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .quick-link { background: white; border-radius: 12px; padding: 20px; text-align: center; text-decoration: none; color: #00838f; box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-weight: 600; }
+        .quick-link span { font-size: 28px; display: block; margin-bottom: 8px; }
+        @media (max-width: 600px) { .nav-top { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="left-part">
+            <div class="logo-paw">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/>
+                </svg>
+            </div>
+            <div class="app-name">AllForPets</div>
+            <div class="city">📍 Київ</div>
+        </div>
+        <div class="nav-top">
+            <a href="/">Головна</a>
+            <a href="/pets">Мої улюбленці</a>
+            <a href="/clinics">Клініки</a>
+            <a href="/search">Записатися</a>
+            <a href="/pharmacies">Ветаптеки</a>
+            <a href="#">Зоомагазини</a>
+        </div>
+        <div class="right-part">
+            <a href="/settings" class="icon-btn">⚙️</a>
+            <a href="/logout" class="icon-btn">🚪</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Мої улюбленці</h2>
+        <a href="/add-pet" class="add-btn">+ Додати улюбленця</a>
+        {% if pets %}
+            {% for p in pets %}
+            <a href="/pet/{{ p.id }}" class="pet-card">
+                {% if p.photo %}<img src="{{ p.photo }}" alt="">{% else %}<div style="width:80px;height:80px;border-radius:50%;background:#e0f7fa;display:flex;align-items:center;justify-content:center;font-size:32px;">🐾</div>{% endif %}
+                <div class="pet-info">
+                    <div class="pet-name">{{ p.name }}</div>
+                    <div class="meta">{{ p.species }}</div>
+                    {% if p.breed %}<div class="meta">{{ p.breed }}</div>{% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        {% else %}
+            <p>У вас ще немає улюбленців.</p>
+        {% endif %}
+    </div>
+
+    <div class="quick-links">
+        <a href="/clinics" class="quick-link"><span>🏥</span>Клініки</a>
+        <a href="/search" class="quick-link"><span>👨‍⚕️</span>Записатися до ветеринара</a>
+        <a href="/pharmacies" class="quick-link"><span>💊</span>Ветаптеки</a>
+        <a href="#" class="quick-link"><span>🛒</span>Зоомагазини</a>
+    </div>
+</body>
+</html>

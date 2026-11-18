@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кабінет керуючого — AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; color: #333; }
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: white; border-bottom: 1px solid #e0f7fa;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 24px; height: 64px;
+        }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-paw {
+            width: 36px; height: 36px; background: #00acc1;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+        }
+        .city-btn { display: flex; align-items: center; gap: 6px; color: #00838f; font-weight: 600; font-size: 15px; }
+        .nav { display: flex; align-items: center; gap: 28px; }
+        .nav a { color: #333; text-decoration: none; font-size: 15px; font-weight: 500; }
+        .nav a:hover { color: #00acc1; }
+        .auth { display: flex; align-items: center; gap: 16px; }
+        .auth a { color: #00838f; text-decoration: none; font-size: 14px; font-weight: 600; }
+        .container { max-width: 800px; margin: 30px auto; padding: 0 20px 40px; }
+        .box { background: white; border-radius: 14px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        label { display: block; margin: 12px 0 4px; font-weight: bold; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 2px solid #b2ebf2; border-radius: 8px; box-sizing: border-box; }
+        button { margin-top: 16px; padding: 12px 24px; background: #00acc1; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .error { color: #d32f2f; margin-bottom: 10px; }
+        .vet-item { padding: 12px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .small-btn { padding: 6px 12px; font-size: 13px; background: #e0f7fa; color: #00838f; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo-area">
+            <div class="logo-paw">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/>
+                </svg>
+            </div>
+            <div class="city-btn">📍 Київ</div>
+        </div>
+        <div class="nav">
+            <a href="/">Головна</a>
+            <a href="/pets">Мої улюбленці</a>
+            <a href="/clinics">Клініки</a>
+            <a href="/search">Записатися</a>
+            <a href="/pharmacies">Ветаптеки</a>
+            <a href="/settings">Налаштування</a>
+        </div>
+        <div class="auth">
+            <a href="/logout">Вийти</a>
+        </div>
+    </div>
+
+<div class="container">
+    <div class="box">
+        <h2 style="color:#00838f; margin-bottom:16px;">Кабінет керуючого</h2>
+        <p><strong>Клініка:</strong> {{ clinic.name if clinic else '—' }}</p>
+        <p><strong>Адреса:</strong> {{ clinic.address if clinic else '—' }}</p>
+    </div>
+
+    {% if manager.can_edit_clinic and clinic %}
+    <div class="box">
+        <h2 style="color:#00838f; margin-bottom:16px;">Дані клініки</h2>
+        <form method="post" action="/clinic/update">
+            <label>Назва *</label>
+            <input type="text" name="name" value="{{ clinic.name }}" required>
+            <label>Адреса *</label>
+            <input type="text" name="address" value="{{ clinic.address or '' }}" required>
+            <label>Телефон *</label>
+            <input type="text" name="phone" id="clinic_phone" value="{{ clinic.phone or '+380' }}" required>
+            <label>Пошта</label>
+            <input type="email" name="email" value="{{ clinic.email or '' }}">
+            <label>Опис</label>
+            <textarea name="description">{{ clinic.description or '' }}</textarea>
+            <label>Графік роботи</label>
+            <input type="text" name="work_hours" value="{{ clinic.work_hours or '' }}">
+            <label style="display:flex; align-items:center; gap:8px; margin-top:12px;">
+                <input type="checkbox" name="is_24h" {% if clinic.is_24h %}checked{% endif %} style="width:auto;">
+                Цілодобово
+            </label>
+            <label style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" name="has_online_booking" {% if clinic.has_online_booking %}checked{% endif %} style="width:auto;">
+                Онлайн-запис
+            </label>
+            <label style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" name="show_vets" {% if clinic.show_vets %}checked{% endif %} style="width:auto;">
+                Показувати лікарів
+            </label>
+            <button type="submit">Зберегти зміни</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if manager.can_manage_vets %}
+    <div class="box">
+        <h3 style="color:#00838f; margin-bottom:12px;">Додати лікаря</h3>
+        <form method="post" action="/clinic/add-vet" enctype="multipart/form-data">
+            <label>ID користувача *</label>
+            <input type="number" name="user_id" required min="1">
+            <label>Спеціальність *</label>
+            <select name="specialty" required>
+                <option value="Терапевт">Терапевт</option>
+                <option value="Хірург">Хірург</option>
+                <option value="Дерматолог">Дерматолог</option>
+                <option value="Кардіолог">Кардіолог</option>
+                <option value="Офтальмолог">Офтальмолог</option>
+                <option value="Стоматолог">Стоматолог</option>
+                <option value="Невролог">Невролог</option>
+                <option value="Ортопед">Ортопед</option>
+                <option value="Гастроентеролог">Гастроентеролог</option>
+                <option value="Ендокринолог">Ендокринолог</option>
+                <option value="Онколог">Онколог</option>
+                <option value="Інфекціоніст">Інфекціоніст</option>
+                <option value="Реабілітолог">Реабілітолог</option>
+                <option value="Анестезіолог">Анестезіолог</option>
+                <option value="Радіолог">Радіолог</option>
+                <option value="Лабораторна діагностика">Лабораторна діагностика</option>
+                <option value="Інше">Інше</option>
+            </select>
+            <label>Тварини *</label>
+            <select name="animal_type" required>
+                <option value="Собаки">Собаки</option>
+                <option value="Коти">Коти</option>
+                <option value="Собаки і коти">Собаки і коти</option>
+                <option value="Гризуни">Гризуни</option>
+                <option value="Птахи">Птахи</option>
+                <option value="Екзотичні">Екзотичні</option>
+                <option value="Усі види">Усі види</option>
+            </select>
+            <label>Послуга</label>
+            <select name="service">
+                <option value="Консультація">Консультація</option>
+                <option value="Діагностика">Діагностика</option>
+                <option value="Лікування">Лікування</option>
+                <option value="Хірургія">Хірургія</option>
+                <option value="Вакцинація">Вакцинація</option>
+                <option value="Стерилізація">Стерилізація</option>
+                <option value="Стоматологія">Стоматологія</option>
+                <option value="УЗД">УЗД</option>
+                <option value="Аналізи">Аналізи</option>
+                <option value="Інше">Інше</option>
+            </select>
+            <label>Опис *</label>
+            <textarea name="description" required placeholder="Про лікаря..."></textarea>
+            <label>Фото *</label>
+            <input type="file" name="photo" accept="image/*" required>
+            <label>Стаж (років)</label>
+            <input type="number" name="experience" min="0" max="60" placeholder="5">
+            <label>Телефон</label>
+            <input type="text" name="phone" id="vet_phone" value="+380">
+            <label>Ціна прийому *</label>
+            <input type="number" name="price" required min="0">
+            <button type="submit">Додати лікаря</button>
+        </form>
+    </div>
+
+    <div class="box">
+        <h3 style="color:#00838f; margin-bottom:12px;">Лікарі клініки</h3>
+        {% if vets %}
+            {% for v in vets %}
+            <div class="vet-item">
+                <div>
+                    <strong>{{ v.name }}</strong> — {{ v.specialty }}
+                    {% if v.experience %}<span style="color:#666;"> (стаж: {{ v.experience }} років)</span>{% endif %}
+                </div>
+                <div>
+                    <a href="/clinic/vet/{{ v.id }}/edit" class="small-btn">Редагувати</a>
+                    <form method="post" action="/clinic/delete-vet/{{ v.id }}" style="display:inline;">
+                        <button type="submit" class="small-btn" style="background:#ffebee; color:#c62828;" onclick="return confirm('Видалити лікаря?')">Видалити</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color:#888;">Лікарів ще немає.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if manager.can_view_schedule %}
+    <div class="box">
+        <h3 style="color:#00838f; margin-bottom:12px;">Розклад лікарів</h3>
+        {% if vets %}
+            {% for v in vets %}
+            <div class="vet-item">
+                <div><strong>{{ v.name }}</strong> — {{ v.specialty }}</div>
+                <a href="/manager/schedule/{{ v.id }}" class="small-btn">Переглянути розклад</a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color:#888;">Немає лікарів.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function formatPhone(input) {
+        let val = input.value.replace(/\D/g, '');
+        if (!val.startsWith('380')) val = '380' + val.replace(/^380/, '');
+        val = val.substring(0, 12);
+        let formatted = '+380';
+        if (val.length > 3) formatted += ' ' + val.substring(3, 5);
+        if (val.length > 5) formatted += ' ' + val.substring(5, 8);
+        if (val.length > 8) formatted += ' ' + val.substring(8, 10);
+        if (val.length > 10) formatted += ' ' + val.substring(10, 12);
+        input.value = formatted;
+    }
+
+    ['clinic_phone', 'vet_phone'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', function() { formatPhone(this); });
+            el.addEventListener('keydown', function(e) {
+                if ((e.key === 'Backspace' || e.key === 'Delete') && this.value.length <= 4) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

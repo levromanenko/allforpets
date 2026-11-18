@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Адмін панель — AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; color: #333; }
+        .topbar {
+            background: #0d47a1; color: white;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 24px; height: 64px;
+        }
+        .topbar h1 { font-size: 20px; font-weight: 700; }
+        .topbar-right { display: flex; gap: 16px; }
+        .topbar a { color: white; text-decoration: none; font-weight: 600; }
+        .tabs { display: flex; gap: 4px; background: #0d47a1; padding: 0 24px; }
+        .tab {
+            padding: 12px 20px; color: rgba(255,255,255,0.7); cursor: pointer;
+            border-bottom: 3px solid transparent; font-weight: 600;
+        }
+        .tab.active { color: white; border-bottom-color: #ffeb3b; }
+        .content { max-width: 1100px; margin: 24px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .search-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .search-row input, .search-row select {
+            padding: 10px 14px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px;
+        }
+        .search-row input { flex: 1; min-width: 200px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f5f5f5; font-weight: 600; }
+        .btn { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .btn-primary { background: #0d47a1; color: white; }
+        .btn-danger { background: #e53935; color: white; }
+        .btn-success { background: #4caf50; color: white; }
+        .pagination { display: flex; gap: 8px; justify-content: center; margin-top: 16px; align-items: center; }
+        .pagination button { padding: 8px 14px; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; }
+        .pagination button.active { background: #0d47a1; color: white; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-grid input, .form-grid select, .form-grid textarea {
+            padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px; width: 100%;
+        }
+        .form-grid textarea { grid-column: 1 / -1; min-height: 80px; }
+        .hidden { display: none; }
+        a.link { color: #0d47a1; text-decoration: none; font-weight: 600; }
+        a.link:hover { text-decoration: underline; }
+        .req-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .req-tab { padding: 8px 16px; background: #e3f2fd; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #0d47a1; }
+        .req-tab.active { background: #0d47a1; color: white; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <h1>Адмін панель</h1>
+        <div class="topbar-right">
+            <a href="/">На сайт</a>
+            <a href="/logout">Вийти</a>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="users">Користувачі</div>
+        <div class="tab" data-tab="requests">Заявки</div>
+        <div class="tab" data-tab="clinics">Клініки</div>
+        <div class="tab" data-tab="pharmacies">Аптеки</div>
+        <div class="tab" data-tab="products">Товари</div>
+    </div>
+
+    <div class="content">
+        <div id="users" class="tab-content">
+            <div class="search-row">
+                <input type="text" id="userSearch" placeholder="Пошук за ID...">
+                <select id="roleFilter">
+                    <option value="">Всі ролі</option>
+                    <option value="user">Користувач</option>
+                    <option value="clinic_owner">Власник клініки</option>
+		    <option value="clinic_manager">Керуючий клініки</option>
+                    <option value="vet">Лікар</option>
+                    <option value="pharmacy_owner">Власник аптеки</option>
+                    <option value="admin">Адмін</option>
+                </select>
+            </div>
+            <div class="card">
+                <table id="usersTable">
+                    <thead>
+                        <tr><th>ID</th><th>Ім'я</th><th>Пошта</th><th>Телефон</th><th>Роль</th><th>Дії</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="pagination" id="usersPagination"></div>
+            </div>
+        </div>
+
+        <div id="requests" class="tab-content hidden">
+            <div class="req-tabs">
+                <button class="req-tab active" data-req="reqClinics">Клініки</button>
+                <button class="req-tab" data-req="reqPharmacies">Аптеки</button>
+            </div>
+            <div id="reqClinics" class="card"></div>
+            <div id="reqPharmacies" class="card hidden"></div>
+        </div>
+
+        <div id="clinics" class="tab-content hidden">
+            <div class="card" id="clinicsList"></div>
+        </div>
+
+        <div id="pharmacies" class="tab-content hidden">
+            <div class="card" id="pharmaciesList"></div>
+        </div>
+
+        <div id="products" class="tab-content hidden">
+            <div class="card">
+                <h3 style="margin-bottom:12px;">Додати товар</h3>
+                                                                     <form method="post" action="/admin/add-product" enctype="multipart/form-data">
+                    <div class="form-grid">
+                        <input type="text" name="name" placeholder="Назва товару" required>
+                        <select name="form" id="formSelect" required onchange="updateVolumeOptions()">
+                            <option value="">Форма випуску</option>
+                            <option value="Таблетки">Таблетки</option>
+                            <option value="Капсули">Капсули</option>
+                            <option value="Сироп">Сироп</option>
+                            <option value="Краплі">Краплі</option>
+                            <option value="Мазь">Мазь</option>
+                            <option value="Порошок">Порошок</option>
+                            <option value="Спрей">Спрей</option>
+                            <option value="Інше">Інше</option>
+                        </select>
+                        <select name="animal_type">
+                            <option value="">Вид тварини</option>
+                            <option value="Собака">Собака</option>
+                            <option value="Кіт">Кіт</option>
+                            <option value="Собака / Кіт">Собака / Кіт</option>
+                        </select>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <input type="text" name="weight_from" placeholder="від" style="flex:1;">
+                            <span>кг</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <input type="text" name="weight_to" placeholder="до" style="flex:1;">
+                            <span>кг</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <input type="text" name="volume_num" placeholder="Кількість" style="flex:1;">
+                            <select name="volume_unit" id="volumeUnit" style="width:auto;">
+                                <option value="табл.">табл.</option>
+                            </select>
+                        </div>
+                        <input type="text" name="manufacturer" placeholder="Виробник">
+                        <textarea name="description" placeholder="Опис"></textarea>
+                        <input type="file" name="photo" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top:12px;">Додати</button>
+                </form>
+                <script>
+                function updateVolumeOptions() {
+                    const form = document.getElementById('formSelect').value;
+                    const unit = document.getElementById('volumeUnit');
+                    const options = {
+                        'Таблетки': ['табл.'],
+                        'Капсули': ['капс.'],
+                        'Сироп': ['мл'],
+                        'Краплі': ['піпетка', 'мл'],
+                        'Мазь': ['г', 'мл'],
+                        'Порошок': ['г', 'кг'],
+                        'Спрей': ['мл'],
+                        'Інше': ['шт.', 'мл', 'г', 'піпетка']
+                    };
+                    unit.innerHTML = '';
+                    (options[form] || ['шт.']).forEach(o => {
+                        const opt = document.createElement('option');
+                        opt.value = o;
+                        opt.textContent = o;
+                        unit.appendChild(opt);
+                    });
+                }
+                </script>
+                <script>
+                function updateVolumeOptions() {
+                    const form = document.getElementById('formSelect').value;
+                    const unit = document.getElementById('volumeUnit');
+                    const options = {
+                        'Таблетки': ['табл.'],
+                        'Капсули': ['капс.'],
+                        'Сироп': ['мл'],
+                        'Краплі': ['мл'],
+                        'Мазь': ['г', 'мл'],
+                        'Порошок': ['г', 'кг'],
+                        'Спрей': ['мл'],
+                        'Інше': ['шт.', 'мл', 'г']
+                    };
+                    unit.innerHTML = '';
+                    (options[form] || ['шт.']).forEach(o => {
+                        const opt = document.createElement('option');
+                        opt.value = o;
+                        opt.textContent = o;
+                        unit.appendChild(opt);
+                    });
+                }
+                </script>
+            </div>
+            <div class="card" id="productsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const users = {{ users_json | safe }};
+        const clinics = {{ clinics_json | safe }};
+        const pharmacies = {{ pharmacies_json | safe }};
+        const products = {{ products_json | safe }};
+
+        let currentUserPage = 1;
+        const perPage = 12;
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const name = this.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+                document.getElementById(name).classList.remove('hidden');
+                this.classList.add('active');
+                if (name === 'users') renderUsers();
+                if (name === 'requests') renderRequests();
+                if (name === 'clinics') renderClinics();
+                if (name === 'pharmacies') renderPharmacies();
+                if (name === 'products') renderProducts();
+            });
+        });
+
+        document.querySelectorAll('.req-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const name = this.dataset.req;
+                document.getElementById('reqClinics').classList.add('hidden');
+                document.getElementById('reqPharmacies').classList.add('hidden');
+                document.getElementById(name).classList.remove('hidden');
+                document.querySelectorAll('.req-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.getElementById('userSearch').addEventListener('input', () => { currentUserPage = 1; renderUsers(); });
+        document.getElementById('roleFilter').addEventListener('change', () => { currentUserPage = 1; renderUsers(); });
+
+        function renderUsers() {
+            const search = document.getElementById('userSearch').value.toLowerCase();
+            const role = document.getElementById('roleFilter').value;
+            let filtered = users.filter(u => {
+                if (search && !String(u.id).includes(search)) return false;
+                if (role && u.role !== role) return false;
+                return true;
+            });
+            const total = Math.ceil(filtered.length / perPage) || 1;
+            const start = (currentUserPage - 1) * perPage;
+            const page = filtered.slice(start, start + perPage);
+            const tbody = document.querySelector('#usersTable tbody');
+            tbody.innerHTML = page.map(u => `
+                <tr>
+                    <td>${u.id}</td>
+                    <td>${u.full_name || '—'}</td>
+                    <td>${u.email || '—'}</td>
+                    <td>${u.phone || '—'}</td>
+                    <td>${u.role}${u.clinic_name ? ' (' + u.clinic_name + ')' : ''}</td>
+                    <td>
+                        <form method="post" action="/admin/set-role" style="display:inline;">
+                            <input type="hidden" name="user_id" value="${u.id}">
+                            <select name="role" onchange="this.form.submit()">
+                                <option value="user" ${u.role==='user'?'selected':''}>user</option>
+                                <option value="clinic_owner" ${u.role==='clinic_owner'?'selected':''}>clinic_owner</option>
+                                <option value="vet" ${u.role==='vet'?'selected':''}>vet</option>
+                                <option value="pharmacy_owner" ${u.role==='pharmacy_owner'?'selected':''}>pharmacy_owner</option>
+                                <option value="admin" ${u.role==='admin'?'selected':''}>admin</option>
+                            </select>
+                        </form>
+                        <form method="post" action="/admin/block-user" style="display:inline;">
+                            <input type="hidden" name="user_id" value="${u.id}">
+                            <button class="btn ${u.is_blocked ? 'btn-success' : 'btn-danger'}">${u.is_blocked ? 'Розблокувати' : 'Блокувати'}</button>
+                        </form>
+                    </td>
+                </tr>
+            `).join('');
+            const pag = document.getElementById('usersPagination');
+            pag.innerHTML = '';
+            for (let i = 1; i <= total; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                if (i === currentUserPage) btn.classList.add('active');
+                btn.onclick = () => { currentUserPage = i; renderUsers(); };
+                pag.appendChild(btn);
+            }
+        }
+
+        function renderRequests() {
+            const pendingClinics = clinics.filter(c => c.status === 'pending');
+            document.getElementById('reqClinics').innerHTML = pendingClinics.length ? pendingClinics.map(c => `
+                <div style="padding:12px;border-bottom:1px solid #eee;">
+                    <strong>${c.name}</strong> — ${c.address || '—'}
+                    <a href="/admin/clinic/${c.id}" class="link">Деталі</a>
+                    <form method="post" action="/admin/clinic-status" style="display:inline;">
+                        <input type="hidden" name="clinic_id" value="${c.id}">
+                        <button name="status" value="approved" class="btn btn-success">Схвалити</button>
+                        <button name="status" value="rejected" class="btn btn-danger">Відхилити</button>
+                    </form>
+                </div>
+            `).join('') : '<p>Немає заявок</p>';
+
+            const pendingPharm = pharmacies.filter(p => p.status === 'pending');
+            document.getElementById('reqPharmacies').innerHTML = pendingPharm.length ? pendingPharm.map(p => `
+                <div style="padding:12px;border-bottom:1px solid #eee;">
+                    <strong>${p.name}</strong> — ${p.street || '—'}
+                    <a href="/admin/pharmacy/${p.id}" class="link">Деталі</a>
+                    <form method="post" action="/admin/pharmacy-status" style="display:inline;">
+                        <input type="hidden" name="pharmacy_id" value="${p.id}">
+                        <button name="status" value="approved" class="btn btn-success">Схвалити</button>
+                        <button name="status" value="rejected" class="btn btn-danger">Відхилити</button>
+                    </form>
+                </div>
+            `).join('') : '<p>Немає заявок</p>';
+        }
+
+        function renderClinics() {
+            document.getElementById('clinicsList').innerHTML = clinics.map(c => `
+                <div style="padding:12px;border-bottom:1px solid #eee;">
+                    <strong>${c.name}</strong> — ${c.status}
+                    <a href="/admin/clinic/${c.id}" class="link">Деталі</a>
+                </div>
+            `).join('') || '<p>Немає клінік</p>';
+        }
+
+        function renderPharmacies() {
+            document.getElementById('pharmaciesList').innerHTML = pharmacies.map(p => `
+                <div style="padding:12px;border-bottom:1px solid #eee;">
+                    <strong>${p.name}</strong> — ${p.status}
+                    <a href="/admin/pharmacy/${p.id}" class="link">Деталі</a>
+                </div>
+            `).join('') || '<p>Немає аптек</p>';
+        }
+
+        function renderProducts() {
+            document.getElementById('productsList').innerHTML = products.map(p => `
+                <div style="padding:12px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <a href="/admin/product/${p.id}" class="link"><strong>${p.name}</strong></a>
+                        <span style="color:#888;margin-left:8px;">${p.form || ''} ${p.volume || ''}</span>
+                    </div>
+                    <form method="post" action="/admin/delete-product" style="display:inline;">
+                        <input type="hidden" name="product_id" value="${p.id}">
+                        <button class="btn btn-danger">Видалити</button>
+                    </form>
+                </div>
+            `).join('') || '<p>Немає товарів</p>';
+        }
+
+        renderUsers();
+    </script>
+</body>
+</html>

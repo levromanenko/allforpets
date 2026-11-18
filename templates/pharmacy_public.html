@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ pharmacy.name }} — AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; color: #333; }
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: white; border-bottom: 1px solid #e0f7fa;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 24px; height: 64px;
+        }
+        .left-part { display: flex; align-items: center; gap: 14px; }
+        .logo-paw {
+            width: 36px; height: 36px; background: #00acc1;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+        }
+        .app-name { font-size: 20px; font-weight: 700; color: #00838f; }
+        .city { display: flex; align-items: center; gap: 6px; color: #00838f; font-weight: 600; }
+        .right-part { display: flex; align-items: center; gap: 16px; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: #00838f; text-decoration: none; }
+        .nav-top { display: flex; gap: 20px; align-items: center; }
+        .nav-top a { color: #00838f; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .nav-top a:hover { text-decoration: underline; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .back-link { display: inline-block; color: #00838f; text-decoration: none; font-weight: 600; margin-bottom: 16px; }
+        .pharmacy-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .pharmacy-row { display: flex; gap: 16px; align-items: flex-start; }
+        .pharmacy-photo { width: 100px; height: 100px; border-radius: 12px; object-fit: cover; background: #e0f7fa; flex-shrink: 0; }
+        .pharmacy-main { flex: 1; min-width: 0; }
+        .pharmacy-name { font-size: 20px; font-weight: 700; color: #00838f; }
+        .desc-line { margin-top: 4px; display: flex; align-items: center; gap: 8px; }
+        .pharmacy-desc { font-size: 13px; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+        .pharmacy-desc.open { white-space: normal; overflow: visible; }
+        .more-btn { background: none; border: none; color: #00acc1; cursor: pointer; font-size: 12px; font-weight: 600; flex-shrink: 0; padding: 0; }
+        .more-btn:hover { text-decoration: underline; }
+        .pharmacy-meta { margin-top: 12px; }
+        .meta { font-size: 14px; color: #555; margin: 5px 0; display: flex; align-items: center; gap: 6px; }
+        .meta a { color: #00838f; text-decoration: none; }
+        .meta a:hover { text-decoration: underline; }
+        .search-box { margin-top: 16px; position: relative; }
+        .search-box input { width: 100%; padding: 12px 16px; border: 2px solid #00acc1; border-radius: 10px; font-size: 15px; }
+        .search-box input:focus { outline: none; }
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 10; display: none; }
+        .suggestions div { padding: 10px 14px; cursor: pointer; }
+        .suggestions div:hover { background: #f0f0f0; }
+        .products-section { margin-top: 24px; }
+        .products-section h3 { color: #00838f; margin-bottom: 16px; }
+        .products-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+        .product-card { background: white; border-radius: 12px; padding: 14px; width: calc(25% - 12px); min-width: 180px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-decoration: none; color: inherit; }
+        .product-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .product-photo { width: 100%; height: 100px; border-radius: 8px; object-fit: cover; background: #e0f7fa; }
+        .product-name { font-weight: 700; color: #00838f; margin-top: 8px; font-size: 14px; }
+        .product-meta { font-size: 12px; color: #888; margin-top: 4px; }
+        .product-price { font-weight: 700; color: #00838f; margin-top: 6px; }
+        .quick-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .quick-link { background: white; border-radius: 12px; padding: 20px; text-align: center; text-decoration: none; color: #00838f; box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-weight: 600; }
+        .quick-link span { font-size: 28px; display: block; margin-bottom: 8px; }
+        @media (max-width: 900px) { .product-card { width: calc(50% - 8px); } }
+        @media (max-width: 600px) { .nav-top { display: none; } .pharmacy-row { flex-direction: column; } .product-card { width: 100%; } }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="left-part">
+            <div class="logo-paw">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/>
+                </svg>
+            </div>
+            <div class="app-name">AllForPets</div>
+            <div class="city">📍 Київ</div>
+        </div>
+        <div class="nav-top">
+            <a href="/">Головна</a>
+            <a href="/pets">Мої улюбленці</a>
+            <a href="/clinics">Клініки</a>
+            <a href="/search">Записатися</a>
+            <a href="/pharmacies">Ветаптеки</a>
+            <a href="#">Зоомагазини</a>
+        </div>
+        <div class="right-part">
+            {% if user %}
+            <a href="/settings" class="icon-btn">⚙️</a>
+            <a href="/logout" class="icon-btn">🚪</a>
+            {% else %}
+            <a href="/login" class="icon-btn">🔑</a>
+            <a href="/register" class="icon-btn">📝</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="/pharmacies" class="back-link">← Назад до аптек</a>
+        <div class="pharmacy-card">
+            <div class="pharmacy-row">
+                {% if pharmacy.photo %}
+                <img src="{{ pharmacy.photo }}" class="pharmacy-photo" alt="">
+                {% else %}
+                <div class="pharmacy-photo" style="display:flex;align-items:center;justify-content:center;font-size:40px;">💊</div>
+                {% endif %}
+                <div class="pharmacy-main">
+                    <div class="pharmacy-name">{{ pharmacy.name }}</div>
+                    {% if pharmacy.description %}
+                    <div class="desc-line">
+                        <div class="pharmacy-desc" id="desc">{{ pharmacy.description }}</div>
+                        <button class="more-btn" id="more-btn" onclick="toggleDesc()">Детальніше</button>
+                    </div>
+                    {% endif %}
+                    <div class="pharmacy-meta">
+                        {% if pharmacy.district %}<div class="meta">📍 {{ pharmacy.district }} район</div>{% endif %}
+                        {% if pharmacy.street %}
+                        <div class="meta">🗺️ <a href="https://www.google.com/maps/search/?api=1&query={{ ('м. Київ, ' + pharmacy.district + ' район, ' + pharmacy.street)|urlencode }}" target="_blank">м. Київ, {{ pharmacy.district }} район, {{ pharmacy.street }}</a></div>
+                        {% endif %}
+                        {% if pharmacy.phone %}<div class="meta">📞 {{ pharmacy.phone }}</div>{% endif %}
+                        {% if pharmacy.work_hours %}
+                        <div class="meta">🕐 {{ pharmacy.work_hours }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="search-box">
+                        <input type="text" id="productSearch" placeholder="Знайти товар..." oninput="searchProducts()">
+                        <div class="suggestions" id="suggestions"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="products-section">
+            <h3>Товари</h3>
+            <div class="products-grid" id="productsGrid">
+                {% for p in products %}
+                <a href="/pharmacy/{{ pharmacy.id }}/product/{{ p.id }}" class="product-card">
+                    {% if p.photo %}
+                    <img src="{{ p.photo }}" class="product-photo" alt="">
+                    {% else %}
+                    <div class="product-photo" style="display:flex;align-items:center;justify-content:center;font-size:32px;">💊</div>
+                    {% endif %}
+                    <div class="product-name">{{ p.name }}</div>
+                    <div class="product-meta">{{ p.volume or '' }} {{ p.form or '' }}</div>
+                    <div class="product-price">{{ p.price }} грн</div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-links">
+        <a href="/clinics" class="quick-link"><span>🏥</span>Клініки</a>
+        <a href="/search" class="quick-link"><span>👨‍⚕️</span>Записатися до ветеринара</a>
+        <a href="/pharmacies" class="quick-link"><span>💊</span>Ветаптеки</a>
+        <a href="#" class="quick-link"><span>🛒</span>Зоомагазини</a>
+    </div>
+
+    <script>
+        const allProducts = {{ products_json|safe }};
+
+        function toggleDesc() {
+            const desc = document.getElementById('desc');
+            const btn = document.getElementById('more-btn');
+            if (desc.classList.contains('open')) {
+                desc.classList.remove('open');
+                btn.textContent = 'Детальніше';
+            } else {
+                desc.classList.add('open');
+                btn.textContent = 'Згорнути';
+            }
+        }
+
+        function searchProducts() {
+            const q = document.getElementById('productSearch').value.toLowerCase();
+            const sugg = document.getElementById('suggestions');
+            if (!q) {
+                sugg.style.display = 'none';
+                return;
+            }
+            const matches = allProducts.filter(p => p.name.toLowerCase().includes(q));
+            if (matches.length) {
+                sugg.innerHTML = matches.map(p => `<div onclick="selectProduct(${p.id})">${p.name}</div>`).join('');
+                sugg.style.display = 'block';
+            } else {
+                sugg.style.display = 'none';
+            }
+        }
+
+        function selectProduct(id) {
+            window.location.href = `/pharmacy/{{ pharmacy.id }}/product/${id}`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редагувати лікаря — Мої улюбленці</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #e0f7fa; }
+        .header {
+            background: #00acc1; color: white; padding: 14px 20px;
+            display: flex; align-items: center; gap: 15px;
+        }
+        .header a { color: white; text-decoration: none; }
+        .header span { flex: 1; text-align: center; font-weight: bold; }
+        .container { max-width: 520px; margin: 20px auto; padding: 0 16px 40px; }
+        .card {
+            background: white; border-radius: 14px; padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        label { display: block; margin: 12px 0 6px; font-weight: bold; font-size: 14px; }
+        input, textarea, select {
+            width: 100%; padding: 10px; border: 2px solid #b2ebf2;
+            border-radius: 8px; font-size: 15px;
+        }
+        textarea { height: 80px; resize: vertical; }
+        button {
+            width: 100%; padding: 12px; background: #00acc1; color: white;
+            border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 16px;
+        }
+        button:hover { background: #00838f; }
+        .note { font-size: 12px; color: #888; margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/clinic/cabinet">← Назад</a>
+        <span>Редагувати лікаря</span>
+        <span style="width:50px;"></span>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <form method="post" action="/clinic/vet/{{ vet.id }}/edit">
+                <label>Ім’я лікаря *</label>
+                <input type="text" name="name" value="{{ vet.name }}" required>
+
+                <label>Спеціальність *</label>
+                <select name="specialty" required>
+                    <option value="Терапевт" {% if vet.specialty == 'Терапевт' %}selected{% endif %}>Терапевт</option>
+                    <option value="Хірург" {% if vet.specialty == 'Хірург' %}selected{% endif %}>Хірург</option>
+                    <option value="Дерматолог" {% if vet.specialty == 'Дерматолог' %}selected{% endif %}>Дерматолог</option>
+                    <option value="Кардіолог" {% if vet.specialty == 'Кардіолог' %}selected{% endif %}>Кардіолог</option>
+                    <option value="Офтальмолог" {% if vet.specialty == 'Офтальмолог' %}selected{% endif %}>Офтальмолог</option>
+                    <option value="Стоматолог" {% if vet.specialty == 'Стоматолог' %}selected{% endif %}>Стоматолог</option>
+                    <option value="Невролог" {% if vet.specialty == 'Невролог' %}selected{% endif %}>Невролог</option>
+                    <option value="Ортопед" {% if vet.specialty == 'Ортопед' %}selected{% endif %}>Ортопед</option>
+                    <option value="Ендокринолог" {% if vet.specialty == 'Ендокринолог' %}selected{% endif %}>Ендокринолог</option>
+                    <option value="Онколог" {% if vet.specialty == 'Онколог' %}selected{% endif %}>Онколог</option>
+                    <option value="Інше" {% if vet.specialty == 'Інше' %}selected{% endif %}>Інше</option>
+                </select>
+
+                <label>Послуга</label>
+                <input type="text" name="service" value="{{ vet.service or '' }}">
+
+                <label>Вид тварини *</label>
+                <select name="animal_type" required>
+                    <option value="Собаки" {% if vet.animal_type == 'Собаки' %}selected{% endif %}>Собаки</option>
+                    <option value="Коти" {% if vet.animal_type == 'Коти' %}selected{% endif %}>Коти</option>
+                    <option value="Собаки та коти" {% if vet.animal_type == 'Собаки та коти' %}selected{% endif %}>Собаки та коти</option>
+                    <option value="Екзотичні тварини" {% if vet.animal_type == 'Екзотичні тварини' %}selected{% endif %}>Екзотичні тварини</option>
+                    <option value="Усі тварини" {% if vet.animal_type == 'Усі тварини' %}selected{% endif %}>Усі тварини</option>
+                </select>
+
+                <label>Телефон лікаря</label>
+                <input type="tel" name="phone" value="{{ vet.phone or '+380 ' }}" maxlength="17">
+                <div class="note">Залиш порожнім, якщо не хочеш показувати телефон.</div>
+
+                <label>Ціна запису (грн) *</label>
+                <input type="number" name="price" value="{{ vet.price or '' }}" step="0.01" min="0" required>
+
+                <label>Опис</label>
+                <textarea name="description">{{ vet.description or '' }}</textarea>
+
+                <button type="submit">Зберегти зміни</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

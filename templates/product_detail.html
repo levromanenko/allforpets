@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} — {{ pharmacy.name }}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; color: #333; }
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: white; border-bottom: 1px solid #e0f7fa;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 24px; height: 64px;
+        }
+        .left-part { display: flex; align-items: center; gap: 14px; }
+        .logo-paw {
+            width: 36px; height: 36px; background: #00acc1;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+        }
+        .app-name { font-size: 20px; font-weight: 700; color: #00838f; }
+        .city { display: flex; align-items: center; gap: 6px; color: #00838f; font-weight: 600; }
+        .right-part { display: flex; align-items: center; gap: 16px; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: #00838f; text-decoration: none; }
+        .nav-top { display: flex; gap: 20px; align-items: center; }
+        .nav-top a { color: #00838f; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        .back-link { display: inline-block; color: #00838f; text-decoration: none; font-weight: 600; margin-bottom: 16px; }
+        .product-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .product-row { display: flex; gap: 24px; }
+        .product-photo { width: 280px; height: 280px; border-radius: 12px; object-fit: cover; background: #e0f7fa; flex-shrink: 0; }
+        .product-info { flex: 1; }
+        .product-name { font-size: 22px; font-weight: 700; color: #00838f; margin-bottom: 12px; }
+        .price { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 16px; }
+        .buy-btn { background: #00acc1; color: white; border: none; padding: 12px 32px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .buy-btn:hover { background: #00838f; }
+        .characteristics { margin-top: 24px; }
+        .characteristics h3 { color: #00838f; margin-bottom: 12px; font-size: 18px; }
+        .char-row { padding: 8px 0; border-bottom: 1px solid #eee; font-size: 15px; }
+        .char-row:last-child { border-bottom: none; }
+        .char-label { color: #888; }
+        .quick-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .quick-link { background: white; border-radius: 12px; padding: 20px; text-align: center; text-decoration: none; color: #00838f; box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-weight: 600; }
+        .quick-link span { font-size: 28px; display: block; margin-bottom: 8px; }
+        @media (max-width: 700px) { .product-row { flex-direction: column; } .product-photo { width: 100%; height: 200px; } .nav-top { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="left-part">
+            <div class="logo-paw">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/>
+                </svg>
+            </div>
+            <div class="app-name">AllForPets</div>
+            <div class="city">📍 Київ</div>
+        </div>
+        <div class="nav-top">
+            <a href="/">Головна</a>
+            <a href="/pets">Мої улюбленці</a>
+            <a href="/clinics">Клініки</a>
+            <a href="/search">Записатися</a>
+            <a href="/pharmacies">Ветаптеки</a>
+            <a href="#">Зоомагазини</a>
+        </div>
+        <div class="right-part">
+            {% if user %}
+            <a href="/settings" class="icon-btn">⚙️</a>
+            <a href="/logout" class="icon-btn">🚪</a>
+            {% else %}
+            <a href="/login" class="icon-btn">🔑</a>
+            <a href="/register" class="icon-btn">📝</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="/pharmacy/{{ pharmacy.id }}" class="back-link">← Назад до аптеки</a>
+        <div class="product-card">
+            <div class="product-row">
+                {% if product.photo %}
+                <img src="{{ product.photo }}" class="product-photo" alt="">
+                {% else %}
+                <div class="product-photo" style="display:flex;align-items:center;justify-content:center;font-size:64px;">💊</div>
+                {% endif %}
+                <div class="product-info">
+                    <div class="product-name">{{ product.name }}</div>
+                    <div class="price">Ціна: {{ price }} грн</div>
+                    <button class="buy-btn">Купити</button>
+                    <div class="characteristics">
+                        <h3>Характеристики</h3>
+                        {% if product.form %}<div class="char-row"><span class="char-label">Форма:</span> {{ product.form }}</div>{% endif %}
+                        {% if product.volume %}<div class="char-row"><span class="char-label">Об'єм:</span> {{ product.volume }}</div>{% endif %}
+                        {% if product.animal_type %}<div class="char-row"><span class="char-label">Вид:</span> {{ product.animal_type }}</div>{% endif %}
+                        {% if product.weight_from or product.weight_to %}
+                        <div class="char-row"><span class="char-label">Вага:</span> {{ product.weight_from or '—' }}–{{ product.weight_to or '—' }} кг</div>
+                        {% endif %}
+                        {% if product.manufacturer %}<div class="char-row"><span class="char-label">Виробник:</span> {{ product.manufacturer }}</div>{% endif %}
+                        {% if product.description %}<div class="char-row"><span class="char-label">Опис:</span> {{ product.description }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-links">
+        <a href="/clinics" class="quick-link"><span>🏥</span>Клініки</a>
+        <a href="/search" class="quick-link"><span>👨‍⚕️</span>Записатися до ветеринара</a>
+        <a href="/pharmacies" class="quick-link"><span>💊</span>Ветаптеки</a>
+        <a href="#" class="quick-link"><span>🛒</span>Зоомагазини</a>
+    </div>
+</body>
+</html>

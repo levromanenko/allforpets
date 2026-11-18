@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редагувати — {{ pet.name }}</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #e0f7fa; }
+        .header { background: #00acc1; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header a { color: white; text-decoration: none; }
+        .container { max-width: 480px; margin: 25px auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        h1 { color: #00838f; text-align: center; margin-top: 0; }
+        label { display: block; margin: 15px 0 6px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #b2ebf2; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        textarea { height: 100px; resize: vertical; }
+        button { width: 100%; padding: 14px; background: #00acc1; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 25px; }
+        button:hover { background: #00838f; }
+        .current-photo { text-align: center; margin-bottom: 15px; }
+        .current-photo img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/pet/{{ pet.id }}">← Назад</a>
+        <span>Редагувати</span>
+        <span></span>
+    </div>
+
+    <div class="container">
+        <h1>Редагувати профіль</h1>
+
+        {% if pet.photo %}
+        <div class="current-photo">
+            <img src="{{ pet.photo }}" alt="{{ pet.name }}">
+            <p style="font-size:13px;color:#666;">Поточне фото</p>
+        </div>
+        {% endif %}
+
+        <form method="post" action="/pet/{{ pet.id }}/edit" enctype="multipart/form-data">
+            <label>Кличка *</label>
+            <input type="text" name="name" value="{{ pet.name }}" required>
+
+            <label>Вид *</label>
+            <select name="species" required>
+                <option value="Собака" {% if pet.species == 'Собака' %}selected{% endif %}>Собака</option>
+                <option value="Кіт" {% if pet.species == 'Кіт' %}selected{% endif %}>Кіт</option>
+                <option value="Папуга" {% if pet.species == 'Папуга' %}selected{% endif %}>Папуга</option>
+                <option value="Хом'як" {% if pet.species == "Хом'як" %}selected{% endif %}>Хом'як</option>
+                <option value="Кролик" {% if pet.species == 'Кролик' %}selected{% endif %}>Кролик</option>
+                <option value="Інше" {% if pet.species == 'Інше' %}selected{% endif %}>Інше</option>
+            </select>
+
+            <label>Порода</label>
+            <input type="text" name="breed" value="{{ pet.breed or '' }}">
+
+            <label>Дата народження</label>
+            <input type="date" name="birth_date" value="{{ pet.birth_date or '' }}">
+
+            <label>Стать</label>
+            <select name="gender">
+                <option value="">Не вказано</option>
+                <option value="Хлопчик" {% if pet.gender == 'Хлопчик' %}selected{% endif %}>Хлопчик</option>
+                <option value="Дівчинка" {% if pet.gender == 'Дівчинка' %}selected{% endif %}>Дівчинка</option>
+            </select>
+
+            <label>Медична карта / замітки</label>
+            <textarea name="medical_notes">{{ pet.medical_notes or '' }}</textarea>
+
+            <label>Нове фото (залиште порожнім, якщо не змінюєте)</label>
+            <input type="file" name="photo" accept="image/*">
+
+            <button type="submit">Зберегти зміни</button>
+        </form>
+    </div>
+</body>
+</html>

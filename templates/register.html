@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реєстрація — AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .box { background: white; border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .logo { text-align: center; margin-bottom: 24px; }
+        .logo-paw { width: 60px; height: 60px; background: #00acc1; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .app-name { font-size: 22px; font-weight: 700; color: #00838f; }
+        h2 { color: #00838f; text-align: center; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #b2ebf2; border-radius: 8px; font-size: 15px; }
+        button { width: 100%; padding: 12px; background: #00acc1; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #00838f; }
+        .error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+        .link { text-align: center; margin-top: 16px; font-size: 14px; }
+        .link a { color: #00838f; text-decoration: none; }
+        .phone-input { display: flex; align-items: center; border: 1px solid #b2ebf2; border-radius: 8px; margin: 8px 0; }
+        .phone-input span { padding: 12px; color: #666; background: #f5f5f5; border-radius: 8px 0 0 8px; }
+        .phone-input input { border: none; margin: 0; border-radius: 0 8px 8px 0; }
+        .pass-wrap { position: relative; }
+        .pass-wrap input { padding-right: 40px; }
+        .eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="logo">
+            <div class="logo-paw">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/>
+                </svg>
+            </div>
+            <div class="app-name">AllForPets</div>
+        </div>
+        <h2>Реєстрація</h2>
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        <form method="post" action="/register" onsubmit="return checkForm()">
+            <input type="text" name="full_name" placeholder="Ім'я" required>
+            <input type="email" name="email" placeholder="Пошта">
+            <div class="phone-input">
+                <span>+380</span>
+                <input type="tel" name="phone" id="phone" placeholder="XX XXX XX XX" maxlength="12" oninput="formatPhone(this)">
+            </div>
+            <div class="pass-wrap">
+                <input type="password" name="password" id="pass1" placeholder="Пароль" required>
+                <span class="eye" onclick="togglePass('pass1', this)">👁</span>
+            </div>
+            <div class="pass-wrap">
+                <input type="password" name="password2" id="pass2" placeholder="Повторіть пароль" required>
+                <span class="eye" onclick="togglePass('pass2', this)">👁</span>
+            </div>
+            <button type="submit">Зареєструватися</button>
+        </form>
+        <div class="link">Вже є акаунт? <a href="/login">Увійти</a></div>
+    </div>
+    <script>
+        function formatPhone(input) {
+            let v = input.value.replace(/\D/g, '').slice(0, 9);
+            let f = '';
+            if (v.length > 0) f = v.slice(0, 2);
+            if (v.length > 2) f += ' ' + v.slice(2, 5);
+            if (v.length > 5) f += ' ' + v.slice(5, 7);
+            if (v.length > 7) f += ' ' + v.slice(7, 9);
+            input.value = f;
+        }
+        function togglePass(id, el) {
+            const inp = document.getElementById(id);
+            if (inp.type === 'password') { inp.type = 'text'; el.textContent = '🙈'; }
+            else { inp.type = 'password'; el.textContent = '👁'; }
+        }
+        function checkForm() {
+            const p1 = document.getElementById('pass1').value;
+            const p2 = document.getElementById('pass2').value;
+            const email = document.querySelector('input[name="email"]').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            if (!email && !phone) { alert('Вкажіть пошту або телефон'); return false; }
+            if (p1 !== p2) { alert('Паролі не співпадають'); return false; }
+            return true;
+        }
+    </script>
+</body>
+</html>

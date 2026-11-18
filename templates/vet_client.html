@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клієнт — Кабінет лікаря</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #e0f7fa; }
+        .header {
+            background: #00acc1; color: white; padding: 14px 20px;
+            display: flex; align-items: center; gap: 15px;
+        }
+        .header a { color: white; text-decoration: none; }
+        .header span { flex: 1; text-align: center; font-weight: bold; }
+        .container { max-width: 560px; margin: 20px auto; padding: 0 16px 40px; }
+        .card {
+            background: white; border-radius: 14px; padding: 20px;
+            margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .pet { padding: 12px 0; border-bottom: 1px solid #eee; }
+        .pet a { color: #00838f; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/vet/cabinet">← Назад</a>
+        <span>Клієнт ID {{ client.id }}</span>
+        <span style="width:50px;"></span>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2 style="margin:0 0 12px; color:#00838f;">Тварини клієнта</h2>
+            {% if pets %}
+                {% for p in pets %}
+                <div class="pet">
+                    <a href="/vet/pet/{{ p.id }}">{{ p.name }}</a>
+                    <div style="font-size:13px; color:#666;">{{ p.species }}{% if p.breed %} · {{ p.breed }}{% endif %}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color:#888;">У цього клієнта немає тварин.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

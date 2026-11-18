@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Додати улюбленця — AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; color: #333; }
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: white; border-bottom: 1px solid #e0f7fa;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 24px; height: 64px;
+        }
+        .left-part { display: flex; align-items: center; gap: 14px; }
+        .logo-paw {
+            width: 36px; height: 36px; background: #00acc1;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+        }
+        .app-name { font-size: 20px; font-weight: 700; color: #00838f; }
+        .back-link { color: #00838f; text-decoration: none; font-weight: 600; }
+        .container { max-width: 500px; margin: 30px auto; padding: 0 20px; }
+        .box { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        h2 { color: #00838f; margin-bottom: 20px; text-align: center; }
+        label { display: block; font-size: 14px; color: #555; margin-top: 12px; margin-bottom: 4px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #b2ebf2; border-radius: 8px; font-size: 15px; }
+        textarea { min-height: 80px; resize: vertical; }
+        button { width: 100%; padding: 14px; background: #00acc1; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 20px; }
+        button:hover { background: #00838f; }
+        .file-note { font-size: 12px; color: #888; margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="left-part">
+            <div class="logo-paw">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/>
+                </svg>
+            </div>
+            <div class="app-name">AllForPets</div>
+        </div>
+        <a href="/" class="back-link">← Назад</a>
+    </div>
+
+    <div class="container">
+        <div class="box">
+            <h2>Новий улюбленець</h2>
+            <form method="post" action="/add-pet" enctype="multipart/form-data">
+                <label>Ім'я</label>
+                <input type="text" name="name" required>
+
+                <label>Вид</label>
+                <input type="text" name="species" id="species" list="species-list" placeholder="Оберіть або введіть" required>
+                <datalist id="species-list">
+                    <option value="Собака">
+                    <option value="Кіт">
+                    <option value="Кролик">
+                    <option value="Хом'як">
+                    <option value="Папуга">
+                    <option value="Рибки">
+                    <option value="Черепаха">
+                    <option value="Інше">
+                </datalist>
+
+                <label>Порода</label>
+                <input type="text" name="breed" id="breed" list="breed-list" placeholder="Оберіть або введіть">
+                <datalist id="breed-list"></datalist>
+
+                <label>Дата народження</label>
+                <input type="date" name="birth_date">
+
+                <label>Стать</label>
+                <select name="gender">
+                    <option value="Самець">Самець</option>
+                    <option value="Самка">Самка</option>
+                </select>
+
+                <label>Медичні нотатки</label>
+                <textarea name="medical_notes" placeholder="Алергії, хронічні хвороби тощо"></textarea>
+
+                <label>Документ / фото мед. картки</label>
+                <input type="file" name="medical_doc" accept="image/*,.pdf">
+                <div class="file-note">Можна прикріпити фото або PDF</div>
+
+                <label>Фото улюбленця</label>
+                <input type="file" name="photo" accept="image/*">
+
+                <button type="submit">Створити профіль</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const breeds = {
+            "Собака": ["Лабрадор", "Німецька вівчарка", "Хаскі", "Бульдог", "Пудель", "Чихуахуа", "Йоркширський тер'єр", "Такса", "Ретривер", "Мопс", "Коргі", "Шпіц", "Бігль", "Боксер", "Доберман", "Ротвейлер", "Сенбернар", "Колі", "Шарпей", "Безпородний"],
+            "Кіт": ["Британська короткошерста", "Сфінкс", "Мейн-кун", "Сіамська", "Перська", "Шотландська висловуха", "Бенгальська", "Рэгдолл", "Абісинська", "Бірманська", "Норвезька лісова", "Безпородний"],
+            "Кролик": ["Карликовий", "Висловухий", "Ангорський", "Рекс", "Безпородний"],
+            "Хом'як": ["Сирійський", "Джунгарський", "Роборовського", "Безпородний"],
+            "Папуга": ["Хвилястий", "Корела", "Нерозлучник", "Какаду", "Ара", "Безпородний"],
+            "Рибки": ["Гуппі", "Скалярія", "Золота рибка", "Півник", "Безпородний"],
+            "Черепаха": ["Червоновуха", "Сухопутна", "Безпородний"],
+            "Інше": ["Безпородний"]
+        };
+        document.getElementById('species').addEventListener('input', function() {
+            const list = document.getElementById('breed-list');
+            list.innerHTML = '';
+            const species = this.value;
+            if (breeds[species]) {
+                breeds[species].forEach(b => {
+                    const opt = document.createElement('option');
+                    opt.value = b;
+                    list.appendChild(opt);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

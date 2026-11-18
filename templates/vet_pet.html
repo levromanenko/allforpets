@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ pet.name }} — AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; color: #333; }
+        .topbar { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid #e0f7fa; display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; height: 64px; }
+        .left-part { display: flex; align-items: center; gap: 14px; }
+        .logo-paw { width: 36px; height: 36px; background: #00acc1; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .app-name { font-size: 20px; font-weight: 700; color: #00838f; }
+        .back-link { color: #00838f; text-decoration: none; font-weight: 600; }
+        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px 40px; }
+        .profile { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); display: flex; gap: 20px; align-items: flex-start; }
+        .pet-photo { width: 120px; height: 120px; border-radius: 14px; object-fit: cover; background: #e0f7fa; }
+        .species { font-size: 13px; color: #888; }
+        .pet-name { font-size: 24px; font-weight: 700; color: #00838f; }
+        .meta { font-size: 15px; color: #555; margin: 4px 0; }
+        .cals { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .section { background: white; border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .cal-title { display: flex; align-items: center; gap: 8px; color: #00838f; margin-bottom: 10px; font-size: 16px; font-weight: 700; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; color: #888; margin-bottom: 4px; font-weight: 600; }
+        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+        .day { padding: 6px 2px; border-radius: 6px; background: #f5f5f5; min-height: 36px; font-size: 13px; cursor: pointer; }
+        .day.today { outline: 2px solid #00acc1; }
+        .day.has-mood { background: #b2ebf2; }
+        .day.has-visit { outline: 3px solid #4caf50; background: #c8e6c9; }
+        .day.has-appointment { background: #90caf9; }
+        .day.has-reminder-routine { background: #ffcc80; }
+        .day.has-reminder-deworm { background: #ef9a9a; }
+        .day.has-weight { background: #a5d6a7; }
+        .day.has-tooth { background: #fff59d; }
+        .day.has-reminder-done { background: #fff176; }
+        .day.has-reminder-missed { background: #ce93d8; }
+        .nav-month { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 14px; }
+        .nav-month span { cursor: pointer; color: #00838f; font-weight: 600; }
+        .add-form { margin-top: 12px; padding-top: 10px; border-top: 1px solid #e0f7fa; display: flex; flex-direction: column; gap: 8px; }
+        .add-form input, .add-form select { width: 100%; padding: 10px; border: 1px solid #b2ebf2; border-radius: 8px; font-size: 14px; }
+        .add-form button { background: #00acc1; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 16px; padding: 20px; max-width: 400px; width: 90%; }
+        .modal-content h3 { color: #00838f; margin-bottom: 10px; }
+        .modal-content p { margin: 6px 0; font-size: 14px; }
+        .close-btn { background: #e0f7fa; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        .finish-section { background: white; border-radius: 16px; padding: 20px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .finish-section h3 { color: #00838f; margin-bottom: 12px; }
+        .finish-section textarea { width: 100%; padding: 12px; border: 1px solid #b2ebf2; border-radius: 8px; font-size: 14px; min-height: 100px; margin-bottom: 10px; }
+        .finish-section input[type="file"] { margin-bottom: 10px; }
+        .finish-section button { background: #00acc1; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        @media (max-width: 900px) { .cals { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="left-part">
+            <div class="logo-paw"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/></svg></div>
+            <div class="app-name">AllForPets</div>
+        </div>
+        <a href="/vet/cabinet" class="back-link">← Назад</a>
+    </div>
+    <div class="container">
+        <div class="profile">
+            {% if pet.photo %}<img src="{{ pet.photo }}" class="pet-photo" alt="">{% else %}<div class="pet-photo" style="display:flex; align-items:center; justify-content:center; font-size:40px;">🐾</div>{% endif %}
+            <div>
+                <div class="species">{{ pet.species }}</div>
+                <div class="pet-name">{{ pet.name }}</div>
+                <div class="meta">Стать: {{ pet.gender or 'не вказано' }}</div>
+                <div class="meta">Порода: {{ pet.breed or 'не вказано' }}</div>
+                <div class="meta">Дата народження: {{ pet.birth_date.strftime('%d.%m.%Y') if pet.birth_date else 'не вказано' }}</div>
+                <div class="meta">Вага: {{ latest_weight or 'не вказано' }}</div>
+            </div>
+        </div>
+        {% if complaint %}<div class="section" style="background:#fff8e1; margin-bottom:16px;"><div class="cal-title">Скарга клієнта</div><p>{{ complaint }}</p></div>{% endif %}
+        <div class="cals">
+            <div class="section"><div class="cal-title"><div class="dot" style="background:#00acc1;"></div> Настрій</div><div class="nav-month"><span onclick="changeMonth('mood', -1)">←</span><strong id="mood-title"></strong><span onclick="changeMonth('mood', 1)">→</span></div><div class="weekdays"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Нд</div></div><div class="calendar" id="mood-cal"></div></div>
+            <div class="section"><div class="cal-title"><div class="dot" style="background:#2196f3;"></div> Прийоми</div><div class="nav-month"><span onclick="changeMonth('appt', -1)">←</span><strong id="appt-title"></strong><span onclick="changeMonth('appt', 1)">→</span></div><div class="weekdays"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Нд</div></div><div class="calendar" id="appt-cal"></div></div>
+            <div class="section"><div class="cal-title"><div class="dot" style="background:#ff9800;"></div> Нагадування</div><div class="nav-month"><span onclick="changeMonth('reminder', -1)">←</span><strong id="reminder-title"></strong><span onclick="changeMonth('reminder', 1)">→</span></div><div class="weekdays"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Нд</div></div><div class="calendar" id="reminder-cal"></div><form class="add-form" method="post" action="/vet/pet/{{ pet.id }}/reminder"><input type="date" name="date_from" required><input type="date" name="date_to" required><input type="text" name="text" placeholder="Текст нагадування" required><select name="type"><option value="routine">Звичайне</option><option value="deworm">Дегельмінтизація</option></select><button type="submit">Додати нагадування</button></form></div>
+            <div class="section"><div class="cal-title"><div class="dot" style="background:#4caf50;"></div> Вага</div><div class="nav-month"><span onclick="changeMonth('weight', -1)">←</span><strong id="weight-title"></strong><span onclick="changeMonth('weight', 1)">→</span></div><div class="weekdays"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Нд</div></div><div class="calendar" id="weight-cal"></div></div>
+            <div class="section"><div class="cal-title"><div class="dot" style="background:#ffeb3b;"></div> Чистка зубів</div><div class="nav-month"><span onclick="changeMonth('tooth', -1)">←</span><strong id="tooth-title"></strong><span onclick="changeMonth('tooth', 1)">→</span></div><div class="weekdays"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Нд</div></div><div class="calendar" id="tooth-cal"></div></div>
+        </div>
+        <div class="finish-section">
+            <h3>Заключення ветеринару</h3>
+<form action="/vet/pet/{{ pet.id }}/finish" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="appointment_id" value="{{ appointment_id or 0 }}">
+    <textarea name="notes" placeholder="Заключення" required></textarea>
+    <input type="file" name="document">
+    <button type="submit">Завершити сеанс</button>
+</form>
+        </div>
+    </div>
+    <div class="modal" id="detail-modal"><div class="modal-content"><h3 id="modal-title">Деталі</h3><div id="modal-body"></div><button class="close-btn" onclick="closeModal()">Закрити</button></div></div>
+    <script>
+        const moodData = {{ mood_by_date_str|tojson }};
+        const visitData = {{ visit_dates_str|tojson }};
+        const apptData = {{ appointment_dates_str|tojson }};
+        const apptDetail = {{ appointments_detail|tojson }};
+        const visitsDetail = {{ visits_detail|tojson }};
+        const reminderData = {{ reminder_by_date|tojson }};
+        const weightData = {{ weight_by_date|tojson }};
+        const toothData = {{ tooth_dates|tojson }};
+        const moodEmoji = {{ mood_emoji|tojson }};
+        const todayIso = "{{ today_iso }}";
+        const today = new Date();
+        const months = ["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"];
+        let state = { mood: { y: today.getFullYear(), m: today.getMonth() }, appt: { y: today.getFullYear(), m: today.getMonth() }, reminder: { y: today.getFullYear(), m: today.getMonth() }, weight: { y: today.getFullYear(), m: today.getMonth() }, tooth: { y: today.getFullYear(), m: today.getMonth() } };
+        function render(type) {
+            const { y, m } = state[type];
+            document.getElementById(type + '-title').textContent = months[m] + ' ' + y;
+            const cal = document.getElementById(type + '-cal');
+            cal.innerHTML = '';
+            const first = new Date(y, m, 1).getDay();
+            const days = new Date(y, m + 1, 0).getDate();
+            const offset = first === 0 ? 6 : first - 1;
+            for (let i = 0; i < offset; i++) cal.innerHTML += '<div></div>';
+            for (let d = 1; d <= days; d++) {
+                const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                let cls = 'day';
+                if (ds === todayIso) cls += ' today';
+                if (type === 'mood' && moodData[ds]) cls += ' has-mood';
+                if (type === 'appt' && visitData.includes(ds)) cls += ' has-visit';
+                if (type === 'appt' && apptData.includes(ds)) cls += ' has-appointment';
+                if (type === 'reminder' && reminderData[ds]) {
+                    const r = reminderData[ds];
+                    if (ds < todayIso) { cls += r.completed ? ' has-reminder-done' : ' has-reminder-missed'; }
+                    else { cls += r.type === 'deworm' ? ' has-reminder-deworm' : ' has-reminder-routine'; }
+                }
+                if (type === 'weight' && weightData[ds]) cls += ' has-weight';
+                if (type === 'tooth' && toothData.includes(ds)) cls += ' has-tooth';
+                let content = d;
+                if (type === 'mood' && moodData[ds]) content += `<div style="font-size:16px;">${moodEmoji[moodData[ds]] || ''}</div>`;
+                if (type === 'weight' && weightData[ds]) content += `<div style="font-size:11px;">${weightData[ds]}кг</div>`;
+                cal.innerHTML += `<div class="${cls}" onclick="showDetail('${type}', '${ds}')">${content}</div>`;
+            }
+        }
+        function changeMonth(type, dir) { state[type].m += dir; if (state[type].m > 11) { state[type].m = 0; state[type].y++; } if (state[type].m < 0) { state[type].m = 11; state[type].y--; } render(type); }
+        function showDetail(type, ds) {
+            let title = '', body = '';
+            if (type === 'appt' && visitsDetail[ds]) { const v = visitsDetail[ds]; title = 'Прийом ' + ds; body = `<p><strong>Нотатки:</strong> ${v.notes || '—'}</p>`; if (v.document) body += `<p><a href="${v.document}" target="_blank">Документ</a></p>`; }
+            else if (type === 'appt' && apptDetail[ds]) { const a = apptDetail[ds]; title = 'Прийом ' + ds; body = `<p><strong>Час:</strong> ${a.time}</p><p><strong>Лікар:</strong> ${a.vet_name || '—'}</p><p><strong>Скарга:</strong> ${a.complaint || '—'}</p>`; }
+            else if (type === 'weight' && weightData[ds]) { title = 'Вага ' + ds; body = `<p>${weightData[ds]} кг</p>`; }
+            else if (type === 'tooth' && toothData.includes(ds)) { title = 'Чистка ' + ds; body = `<p>Проведена</p>`; }
+            else if (reminderData[ds] && type === 'reminder') { const r = reminderData[ds]; title = 'Нагадування ' + ds; body = `<p>${r.text}</p>`; }
+            else if (type === 'mood' && moodData[ds]) { title = 'Настрій ' + ds; body = `<p>${moodEmoji[moodData[ds]] || ''}</p>`; }
+            else return;
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = body;
+            document.getElementById('detail-modal').classList.add('show');
+        }
+        function closeModal() { document.getElementById('detail-modal').classList.remove('show'); }
+        render('mood'); render('appt'); render('reminder'); render('weight'); render('tooth');
+    </script>
+</body>
+</html>

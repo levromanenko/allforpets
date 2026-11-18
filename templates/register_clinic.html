@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реєстрація клініки — Мої улюбленці</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #e0f7fa; }
+        .box { max-width: 560px; margin: 30px auto; background: white; padding: 28px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h2 { color: #00838f; text-align: center; margin-bottom: 16px; }
+        label { display: block; margin: 14px 0 6px; font-weight: bold; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #b2ebf2; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; margin-top: 20px; padding: 14px; background: #00acc1; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        .error { color: #d32f2f; text-align: center; margin-bottom: 10px; }
+        .terms { background: #f5f5f5; padding: 14px; border-radius: 8px; font-size: 13px; line-height: 1.5; margin: 16px 0; max-height: 160px; overflow-y: auto; }
+        .row { display: flex; gap: 10px; }
+        .row > div { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Реєстрація клініки</h2>
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+        <form method="post" action="/clinics/register" enctype="multipart/form-data">
+            <label>Назва клініки *</label>
+            <input type="text" name="name" required>
+
+            <label>Тип клініки *</label>
+            <select name="clinic_type" required>
+                <option value="private">Приватна</option>
+                <option value="state">Державна</option>
+            </select>
+
+            <label>Район Києва *</label>
+            <select name="district" required>
+                <option value="Голосіївський">Голосіївський</option>
+                <option value="Дарницький">Дарницький</option>
+                <option value="Деснянський">Деснянський</option>
+                <option value="Дніпровський">Дніпровський</option>
+                <option value="Оболонський">Оболонський</option>
+                <option value="Печерський">Печерський</option>
+                <option value="Подільський">Подільський</option>
+                <option value="Святошинський">Святошинський</option>
+                <option value="Солом'янський">Солом'янський</option>
+                <option value="Шевченківський">Шевченківський</option>
+            </select>
+
+            <label>Вулиця *</label>
+            <input type="text" name="street" required placeholder="вул. Хрещатик">
+
+            <label>Будинок *</label>
+            <input type="text" name="house" required placeholder="1">
+
+            <label>Телефон рецепції *</label>
+            <input type="text" name="phone" id="phone" value="+380" required>
+
+            <label>Телефон власника (той, хто подає) *</label>
+            <input type="text" name="owner_phone" id="owner_phone" value="+380" required>
+
+            <label>Пошта *</label>
+            <input type="email" name="email" required placeholder="example@gmail.com">
+
+            <label>Опис *</label>
+            <textarea name="description" required></textarea>
+
+            <label>Графік роботи (будні) *</label>
+            <div class="row">
+                <div><input type="time" name="work_from" required></div>
+                <div><input type="time" name="work_to" required></div>
+            </div>
+
+            <label>Графік роботи (вихідні)</label>
+            <div class="row">
+                <div><input type="time" name="weekend_from"></div>
+                <div><input type="time" name="weekend_to"></div>
+            </div>
+            <label style="font-weight:normal; margin-top:6px;">
+                <input type="checkbox" name="weekend_off" style="width:auto;"> Вихідні не працюємо
+            </label>
+
+            <label>Фото клініки (вхід / емблема) *</label>
+            <input type="file" name="photo" accept="image/*" required>
+
+            <label>Документи (ЄДРПОУ / ФОП) *</label>
+            <input type="file" name="documents" accept="image/*,.pdf" required>
+
+            <div class="terms">
+                <strong>Умови співпраці з платформою «Мої улюбленці»:</strong><br><br>
+                1. Клініка надає правдиву інформацію про себе, лікарів та послуги.<br>
+                2. Платформа має право перевіряти документи та відхиляти заявки.<br>
+                3. У разі підтвердження клініка отримує статус партнера.<br>
+                4. Платформа може брати комісію з онлайн-записів (розмір буде повідомлено окремо).<br>
+                5. Клініка зобов’язується своєчасно оновлювати інформацію про лікарів та графік.<br>
+                6. Порушення умов може призвести до блокування профілю.<br><br>
+                Натискаючи «Подати заявку», ви підтверджуєте, що ознайомилися з умовами і погоджуєтеся з ними.
+            </div>
+
+            <label style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" name="terms" required style="width:auto;">
+                Я ознайомився(лась) з умовами і погоджуюсь
+            </label>
+
+            <button type="submit">Подати заявку</button>
+        </form>
+    </div>
+
+    <script>
+        function formatPhone(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (!val.startsWith('380')) val = '380' + val.replace(/^380/, '');
+            val = val.substring(0, 12);
+            let formatted = '+380';
+            if (val.length > 3) formatted += ' ' + val.substring(3, 5);
+            if (val.length > 5) formatted += ' ' + val.substring(5, 8);
+            if (val.length > 8) formatted += ' ' + val.substring(8, 10);
+            if (val.length > 10) formatted += ' ' + val.substring(10, 12);
+            input.value = formatted;
+        }
+
+        document.getElementById('phone').addEventListener('input', function() {
+            formatPhone(this);
+        });
+        document.getElementById('owner_phone').addEventListener('input', function() {
+            formatPhone(this);
+        });
+
+        // Не даємо видалити +380
+        ['phone', 'owner_phone'].forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('keydown', function(e) {
+                if ((e.key === 'Backspace' || e.key === 'Delete') && this.value.length <= 4) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

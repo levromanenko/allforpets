@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; color: #333; }
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: white; border-bottom: 1px solid #e0f7fa;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 24px; height: 64px;
+        }
+        .left-part { display: flex; align-items: center; gap: 14px; }
+        .logo-paw {
+            width: 36px; height: 36px; background: #00acc1;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+        }
+        .app-name { font-size: 20px; font-weight: 700; color: #00838f; }
+        .city { display: flex; align-items: center; gap: 6px; color: #00838f; font-weight: 600; }
+        .right-part { display: flex; align-items: center; gap: 16px; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: #00838f; text-decoration: none; }
+        .nav-top { display: flex; gap: 20px; align-items: center; }
+        .nav-top a { color: #00838f; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .nav-top a:hover { text-decoration: underline; }
+        .hero {
+            background: linear-gradient(135deg, #00acc1 0%, #00838f 100%);
+            color: white; text-align: center; padding: 40px 20px;
+        }
+        .hero h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero p { font-size: 16px; opacity: 0.9; }
+        .search-box { max-width: 500px; margin: 20px auto 0; display: flex; }
+        .search-box input { flex: 1; padding: 12px 16px; border: none; border-radius: 8px 0 0 8px; font-size: 15px; }
+        .search-box button { padding: 12px 20px; background: #ff9800; color: white; border: none; border-radius: 0 8px 8px 0; cursor: pointer; font-weight: 700; }
+        .ad-banner { background: #e0f7fa; text-align: center; padding: 30px; margin: 20px; border-radius: 12px; color: #00838f; }
+        .pets-section { padding: 20px; max-width: 1100px; margin: 0 auto; }
+        .pets-section h2 { color: #00838f; margin-bottom: 16px; }
+        .pets-list { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; align-items: center; }
+        .pet-card { background: white; border-radius: 12px; padding: 16px; min-width: 180px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; text-decoration: none; color: inherit; }
+        .pet-card img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: #e0f7fa; }
+        .pet-card .name { font-weight: 700; margin-top: 8px; color: #00838f; }
+        .add-circle {
+            min-width: 80px; height: 80px; border-radius: 50%; background: #00acc1;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 36px; text-decoration: none; margin-top: 16px;
+        }
+        .add-circle:hover { background: #00838f; }
+        .reminders { padding: 20px; max-width: 1100px; margin: 0 auto; }
+        .reminders h2 { color: #00838f; margin-bottom: 16px; }
+        .reminder-item { background: white; border-radius: 12px; padding: 16px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+        .reminder-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .quick-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 600px; margin: 20px auto; padding: 0 20px; }
+        .quick-link { background: white; border-radius: 12px; padding: 20px; text-align: center; text-decoration: none; color: #00838f; box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-weight: 600; }
+        .quick-link span { font-size: 28px; display: block; margin-bottom: 8px; }
+        .mood-panel {
+            position: fixed; top: 80px; right: 20px; z-index: 200;
+            background: white; border-radius: 16px; padding: 16px; width: 280px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .mood-panel h3 { color: #00838f; font-size: 16px; margin-bottom: 12px; }
+        .mood-close { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer; color: #999; }
+        .mood-options { display: flex; justify-content: space-between; }
+        .mood-options button { background: none; border: none; font-size: 28px; cursor: pointer; }
+        .mood-options button:hover { transform: scale(1.2); }
+        .pet-select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #b2ebf2; border-radius: 8px; }
+        @media (max-width: 600px) { .mood-panel { right: 10px; width: calc(100% - 20px); } .nav-top { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="left-part">
+            <div class="logo-paw">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/>
+                </svg>
+            </div>
+            <div class="app-name">AllForPets</div>
+            <div class="city">📍 Київ</div>
+        </div>
+        <div class="nav-top">
+            <a href="/">Головна</a>
+            <a href="/clinics">Клініки</a>
+            <a href="/search">Записатися</a>
+            <a href="/pharmacies">Ветаптеки</a>
+            <a href="#">Зоомагазини</a>
+        </div>
+        <div class="right-part">
+            {% if user %}
+            <a href="/settings" class="icon-btn">⚙️</a>
+            <a href="/logout" class="icon-btn">🚪</a>
+            {% else %}
+            <a href="/login" class="icon-btn">🔑</a>
+            <a href="/register" class="icon-btn">📝</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="hero">
+        <h1>Здоров’я вашої тваринки — в одному місці</h1>
+        <p>Клініки, лікарі, онлайн-консультації, медична картка й нагадування про ліки.</p>
+        <form class="search-box" action="/search" method="get">
+            <input type="text" name="specialty" placeholder="Спеціальність лікаря" list="specs">
+            <datalist id="specs">
+                <option value="Терапевт">
+                <option value="Хірург">
+                <option value="Дерматолог">
+                <option value="Стоматолог">
+                <option value="Офтальмолог">
+                <option value="Кардіолог">
+                <option value="Невролог">
+                <option value="Онколог">
+                <option value="Ендокринолог">
+                <option value="Гастроентеролог">
+            </datalist>
+            <button type="submit">Знайти</button>
+        </form>
+    </div>
+
+    <div class="ad-banner">Місце для реклами</div>
+
+    {% if user %}
+    <div class="pets-section">
+        <h2>Мої улюбленці</h2>
+        <div class="pets-list">
+            {% for p in pets %}
+            <a href="/pet/{{ p.id }}" class="pet-card">
+                {% if p.photo %}<img src="{{ p.photo }}" alt="">{% else %}<div style="width:80px;height:80px;border-radius:50%;background:#e0f7fa;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:32px;">🐾</div>{% endif %}
+                <div class="name">{{ p.name }}</div>
+            </a>
+            {% endfor %}
+            <a href="/add-pet" class="add-circle">+</a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if main_reminders %}
+    <div class="reminders">
+        <h2>Нагадування</h2>
+        {% for r in main_reminders %}
+        <a href="/pet/{{ r.pet_id }}" class="reminder-item">
+            <div class="reminder-dot" style="background: {{ r.color }};"></div>
+            <div>
+                <strong>{{ r.title }}</strong>
+                <div style="font-size:13px; color:#666;">{{ r.text }}</div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="quick-links">
+        <a href="/clinics" class="quick-link"><span>🏥</span>Клініки</a>
+        <a href="/search" class="quick-link"><span>👨‍⚕️</span>Записатися до ветеринара</a>
+        <a href="/pharmacies" class="quick-link"><span>💊</span>Ветаптеки</a>
+        <a href="#" class="quick-link"><span>🛒</span>Зоомагазини</a>
+    </div>
+
+    {% if user and pets_need_mood %}
+    <div class="mood-panel" id="mood-panel">
+        <button class="mood-close" onclick="document.getElementById('mood-panel').style.display='none'">×</button>
+        <h3>Настрій улюбленця</h3>
+        {% if pets_need_mood|length > 1 %}
+        <select class="pet-select" id="mood-pet">
+            {% for p in pets_need_mood %}
+            <option value="{{ p.id }}">{{ p.name }}</option>
+            {% endfor %}
+        </select>
+        {% else %}
+        <input type="hidden" id="mood-pet" value="{{ pets_need_mood[0].id }}">
+        {% endif %}
+        <div class="mood-options">
+            <button onclick="saveMood('жахливо')">😫</button>
+            <button onclick="saveMood('погано')">😔</button>
+            <button onclick="saveMood('нормально')">😐</button>
+            <button onclick="saveMood('добре')">🙂</button>
+            <button onclick="saveMood('дуже добре')">🤩</button>
+        </div>
+    </div>
+    <form id="mood-form" method="post" action="/mood" style="display:none;">
+        <input type="hidden" name="pet_id" id="mood-pet-id">
+        <input type="hidden" name="mood" id="mood-value">
+    </form>
+    <script>
+        function saveMood(m) {
+            document.getElementById('mood-pet-id').value = document.getElementById('mood-pet').value;
+            document.getElementById('mood-value').value = m;
+            document.getElementById('mood-form').submit();
+        }
+    </script>
+    {% endif %}
+</body>
+</html>

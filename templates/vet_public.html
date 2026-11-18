@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ vet.name or 'Лікар' }} — AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; color: #333; }
+        .topbar { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid #e0f7fa; display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; height: 64px; }
+        .left-part { display: flex; align-items: center; gap: 14px; }
+        .logo-paw { width: 36px; height: 36px; background: #00acc1; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .app-name { font-size: 20px; font-weight: 700; color: #00838f; }
+        .city { color: #00838f; font-weight: 600; }
+        .nav-top { display: flex; gap: 18px; }
+        .nav-top a { color: #00838f; text-decoration: none; font-weight: 500; font-size: 14px; }
+        .right-part { display: flex; gap: 16px; }
+        .icon-btn { font-size: 22px; text-decoration: none; }
+        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .back-link { color: #00838f; text-decoration: none; font-weight: 600; display: inline-block; margin-bottom: 16px; cursor: pointer; }
+        .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .vet-header { display: flex; gap: 20px; align-items: flex-start; }
+        .vet-photo { width: 100px; height: 100px; border-radius: 12px; object-fit: cover; background: #e0f7fa; }
+        .vet-info h2 { color: #222; margin-bottom: 4px; font-size: 20px; }
+        .specialty { font-size: 13px; color: #00838f; font-weight: 700; }
+        .animals { font-size: 14px; color: #666; margin: 4px 0; }
+        .phone { color: #666; font-size: 14px; margin: 4px 0; }
+        .description { font-size: 14px; color: #444; margin-top: 8px; }
+        .read-more { color: #00838f; font-size: 14px; cursor: pointer; }
+        .clinic-title { color: #00838f; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .clinic-name { font-size: 18px; font-weight: 700; color: #00838f; margin-bottom: 4px; }
+        .address-link { color: #5e35b1; text-decoration: underline; font-size: 14px; }
+        .price { color: #00838f; font-weight: 600; margin-top: 6px; font-size: 14px; }
+        .schedule { font-size: 14px; color: #555; margin-top: 4px; }
+        h3 { color: #00838f; margin-bottom: 12px; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .cal-header button { background: none; border: none; font-size: 18px; cursor: pointer; color: #00838f; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .cal-day-name { text-align: center; font-size: 12px; color: #888; padding: 6px 0; }
+        .cal-day { text-align: center; padding: 10px; border-radius: 8px; background: #f5f5f5; cursor: pointer; }
+        .cal-day:hover { background: #e0f7fa; }
+        .cal-day.today { background: #00acc1; color: white; }
+        .times { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .time-slot { padding: 8px 14px; border-radius: 8px; background: #e0f7fa; color: #00838f; cursor: pointer; }
+        .time-slot:hover { background: #00acc1; color: white; }
+        .booking-form { margin-top: 16px; display: none; }
+        .booking-form.active { display: block; }
+        .booking-form select, .booking-form textarea { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 10px; }
+        .btn { background: #00acc1; color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="left-part">
+            <div class="logo-paw"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/></svg></div>
+            <div class="app-name">AllForPets</div>
+            <div class="city">📍 Київ</div>
+        </div>
+        <div class="nav-top">
+            <a href="/">Головна</a><a href="/pets">Мої улюбленці</a><a href="/clinics">Клініки</a><a href="/search">Записатися</a><a href="/pharmacies">Ветаптеки</a><a href="#">Зоомагазини</a>
+        </div>
+        <div class="right-part">
+            {% if user %}<a href="/settings" class="icon-btn">⚙️</a><a href="/logout" class="icon-btn">🚪</a>{% else %}<a href="/login" class="icon-btn">🔑</a><a href="/register" class="icon-btn">📝</a>{% endif %}
+        </div>
+    </div>
+    <div class="container">
+        <a onclick="history.back()" class="back-link">← Назад</a>
+        <div class="card">
+            <div class="vet-header">
+                {% if vet.photo %}<img src="{{ vet.photo }}" class="vet-photo">{% else %}<div class="vet-photo"></div>{% endif %}
+                <div class="vet-info">
+                    <div class="specialty">{{ vet.specialty or '—' }}</div>
+                    <h2>{{ vet.name or 'Лікар' }}</h2>
+                    {% if vet.animal_type %}<div class="animals">Тварини: {{ vet.animal_type }}</div>{% endif %}
+                    {% if vet.phone %}<div class="phone">📞 {{ vet.phone }}</div>{% endif %}
+                    {% if vet.description %}
+                    <div class="description" id="descShort">{{ vet.description[:100] }}{% if vet.description|length > 100 %}...{% endif %}</div>
+                    {% if vet.description|length > 100 %}<div class="read-more" onclick="document.getElementById('descShort').textContent='{{ vet.description }}'; this.style.display='none';">Читати далі</div>{% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% if vet.clinic %}
+        <div class="card">
+            <div class="clinic-title">Клініка</div>
+            <div class="clinic-name">{{ vet.clinic.name }}</div>
+            {% if vet.clinic.address %}<a href="https://www.google.com/maps/search/?api=1&query={{ vet.clinic.address|urlencode }}" target="_blank" class="address-link">{{ vet.clinic.address }}</a>{% endif %}
+           {% if vet.price %}<div class="price">Прийом: {{ vet.price }} грн</div>{% endif %}
+<div class="schedule">🕐 {{ vet.clinic.work_hours or 'Графік не вказано' }}</div>
+            {% if vet.clinic.schedule %}<div class="schedule">Графік: {{ vet.clinic.schedule }}</div>{% endif %}
+        </div>
+        {% endif %}
+        <div class="card">
+            <h3>Запис на прийом</h3>
+            <div class="cal-header"><button onclick="prevMonth()">←</button><div id="calTitle" style="font-weight:700;"></div><button onclick="nextMonth()">→</button></div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="times" id="times"></div>
+            <form class="booking-form" id="bookingForm" method="post" action="/book">
+                <input type="hidden" name="vet_id" value="{{ vet.id }}">
+                <input type="hidden" name="date" id="bookDate">
+                <input type="hidden" name="time" id="bookTime">
+                {% if user and pets %}
+                <select name="pet_id" required><option value="">Оберіть улюбленця</option>{% for p in pets %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}</select>
+                <textarea name="complaint" placeholder="На що скаржитесь?"></textarea>
+                <button type="submit" class="btn">Записатися</button>
+                {% else %}
+                <p style="color:#c62828;">Для запису потрібен профіль улюбленця. <a href="/add-pet">Додати</a></p>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+    <script>
+    const months = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+    const days = ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+    let year = {{ year or 2026 }}, month = {{ (month or 11) - 1 }};
+    const schedule = "{{ vet.clinic.work_hours if vet.clinic else '' }}";
+    const booked = {{ booked|tojson|safe }};
+    function getHours(isWeekend) {
+        const match = schedule.match(isWeekend ? /Вихідні[:\s]*(\d{2}:\d{2})[–-](\d{2}:\d{2})/ : /Будні[:\s]*(\d{2}:\d{2})[–-](\d{2}:\d{2})/);
+        if (match) return [parseInt(match[1]), parseInt(match[2])];
+        return isWeekend ? [9, 16] : [8, 18];
+    }
+    function render() {
+        document.getElementById('calTitle').textContent = months[month] + ' ' + year;
+        const grid = document.getElementById('calGrid');
+        grid.innerHTML = days.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+        const first = new Date(year, month, 1).getDay();
+        const start = first === 0 ? 6 : first - 1;
+        const total = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+        for (let i = 0; i < start; i++) grid.innerHTML += '<div class="cal-day" style="background:transparent;"></div>';
+        for (let d = 1; d <= total; d++) {
+            const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+            grid.innerHTML += `<div class="cal-day${isToday ? ' today' : ''}" onclick="selectDay(${d})">${d}</div>`;
+        }
+        document.getElementById('times').innerHTML = '';
+        document.getElementById('bookingForm').classList.remove('active');
+    }
+    function prevMonth() { month--; if (month < 0) { month = 11; year--; } render(); }
+    function nextMonth() { month++; if (month > 11) { month = 0; year++; } render(); }
+    function selectDay(d) {
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const date = new Date(year, month, d);
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+        const [startH, endH] = getHours(isWeekend);
+        const times = [];
+        for (let h = startH; h < endH; h++) { 
+            times.push(String(h).padStart(2,'0')+':00'); 
+            times.push(String(h).padStart(2,'0')+':30'); 
+        }
+        const bookedTimes = booked[dateStr] || [];
+        const freeTimes = times.filter(t => !bookedTimes.includes(t));
+        document.getElementById('times').innerHTML = freeTimes.map(t => `<div class="time-slot" onclick="selectTime('${t}', ${d})">${t}</div>`).join('');
+        document.getElementById('bookingForm').classList.remove('active');
+    }
+    function selectTime(t, d) {
+        document.getElementById('bookDate').value = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        document.getElementById('bookTime').value = t;
+        document.getElementById('bookingForm').classList.add('active');
+    }
+    render();
+</script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аптека — Адмін</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; color: #333; }
+        .topbar {
+            background: #0d47a1; color: white;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 24px; height: 64px;
+        }
+        .topbar h1 { font-size: 20px; font-weight: 700; }
+        .topbar a { color: white; text-decoration: none; font-weight: 600; }
+        .container { max-width: 700px; margin: 30px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        h2 { color: #0d47a1; margin-bottom: 16px; }
+        .row { margin: 10px 0; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .row:last-child { border-bottom: none; }
+        .label { font-size: 13px; color: #888; }
+        .value { font-size: 15px; margin-top: 4px; }
+        .photo { max-width: 200px; border-radius: 8px; margin-top: 8px; }
+        .doc-link { color: #0d47a1; font-weight: 600; }
+        .actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-approve { background: #2e7d32; color: white; }
+        .btn-reject { background: #c62828; color: white; }
+        .btn-block { background: #666; color: white; }
+        .back { display: inline-block; margin-bottom: 16px; color: #0d47a1; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <h1>Адмін панель</h1>
+        <a href="/admin">← Назад</a>
+    </div>
+
+    <div class="container">
+        <a href="/admin" class="back">← До списку</a>
+        <div class="card">
+            <h2>{{ pharmacy.name }}</h2>
+            <div class="row">
+                <div class="label">Статус</div>
+                <div class="value">{{ pharmacy.status }}</div>
+            </div>
+            <div class="row">
+                <div class="label">Район</div>
+                <div class="value">{{ pharmacy.district or '—' }}</div>
+            </div>
+            <div class="row">
+                <div class="label">Адреса</div>
+                <div class="value">{{ pharmacy.street or '—' }}</div>
+            </div>
+            <div class="row">
+                <div class="label">Телефон рецепції</div>
+                <div class="value">{{ pharmacy.phone or '—' }}</div>
+            </div>
+            <div class="row">
+                <div class="label">Телефон власника</div>
+                <div class="value">{{ pharmacy.owner_phone or '—' }}</div>
+            </div>
+            <div class="row">
+                <div class="label">Пошта</div>
+                <div class="value">{{ pharmacy.email or '—' }}</div>
+            </div>
+            <div class="row">
+                <div class="label">Опис</div>
+                <div class="value">{{ pharmacy.description or '—' }}</div>
+            </div>
+            <div class="row">
+                <div class="label">Графік роботи</div>
+                <div class="value">{{ pharmacy.work_hours or '—' }}</div>
+            </div>
+            <div class="row">
+                <div class="label">ЄДРПОУ / ФОП</div>
+                <div class="value">{{ pharmacy.edrpou or '—' }}</div>
+            </div>
+            <div class="row">
+                <div class="label">Власник ID</div>
+                <div class="value">{{ pharmacy.owner_id or '—' }}</div>
+            </div>
+            {% if pharmacy.photo %}
+            <div class="row">
+                <div class="label">Фото</div>
+                <img src="{{ pharmacy.photo }}" class="photo" alt="">
+            </div>
+            {% endif %}
+            {% if pharmacy.documents %}
+            <div class="row">
+                <div class="label">Документи</div>
+                <div class="value"><a href="{{ pharmacy.documents }}" target="_blank" class="doc-link">Відкрити документ</a></div>
+            </div>
+            {% endif %}
+
+            <div class="actions">
+                <form method="post" action="/admin/pharmacy-status">
+                    <input type="hidden" name="pharmacy_id" value="{{ pharmacy.id }}">
+                    <input type="hidden" name="status" value="approved">
+                    <button type="submit" class="btn btn-approve">Підтвердити</button>
+                </form>
+                <form method="post" action="/admin/pharmacy-status">
+                    <input type="hidden" name="pharmacy_id" value="{{ pharmacy.id }}">
+                    <input type="hidden" name="status" value="rejected">
+                    <button type="submit" class="btn btn-reject">Відхилити</button>
+                </form>
+                <form method="post" action="/admin/pharmacy-status">
+                    <input type="hidden" name="pharmacy_id" value="{{ pharmacy.id }}">
+                    <input type="hidden" name="status" value="blocked">
+                    <button type="submit" class="btn btn-block">Заблокувати</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

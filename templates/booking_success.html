@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запис підтверджено — AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; color: #333; }
+        .topbar { position: sticky; top: 0; z-index: 100; background: white; border-bottom: 1px solid #e0f7fa; display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; height: 64px; }
+        .left-part { display: flex; align-items: center; gap: 14px; }
+        .logo-paw { width: 36px; height: 36px; background: #00acc1; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .app-name { font-size: 20px; font-weight: 700; color: #00838f; }
+        .city { color: #00838f; font-weight: 600; }
+        .nav-top { display: flex; gap: 18px; }
+        .nav-top a { color: #00838f; text-decoration: none; font-weight: 500; font-size: 14px; }
+        .right-part { display: flex; gap: 16px; }
+        .icon-btn { font-size: 22px; text-decoration: none; }
+        .container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); text-align: center; }
+        h1 { color: #00acc1; margin-bottom: 16px; }
+        .info { text-align: left; margin: 20px 0; font-size: 16px; line-height: 1.6; }
+        .info div { margin-bottom: 8px; }
+        .btn { display: inline-block; background: #00acc1; color: white; text-decoration: none; padding: 12px 28px; border-radius: 10px; font-weight: 600; margin-top: 16px; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="left-part">
+            <div class="logo-paw"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/></svg></div>
+            <div class="app-name">AllForPets</div>
+            <div class="city">📍 Київ</div>
+        </div>
+        <div class="nav-top">
+            <a href="/">Головна</a><a href="/pets">Мої улюбленці</a><a href="/clinics">Клініки</a><a href="/search">Записатися</a><a href="/pharmacies">Ветаптеки</a><a href="#">Зоомагазини</a>
+        </div>
+        <div class="right-part">
+            {% if user %}<a href="/settings" class="icon-btn">⚙️</a><a href="/logout" class="icon-btn">🚪</a>{% else %}<a href="/login" class="icon-btn">🔑</a><a href="/register" class="icon-btn">📝</a>{% endif %}
+        </div>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h1>Запис підтверджено</h1>
+            <div class="info">
+                <div><strong>Лікар:</strong> {{ vet.name or '—' }}</div>
+                <div><strong>Клініка:</strong> {{ vet.clinic.name if vet and vet.clinic else '—' }}</div>
+                <div><strong>Адреса:</strong> {{ vet.clinic.address if vet and vet.clinic else '—' }}</div>
+                <div><strong>Дата:</strong> {{ appointment.date }}</div>
+                <div><strong>Час:</strong> {{ appointment.time }}</div>
+                {% if pet %}<div><strong>Улюбленець:</strong> {{ pet.name }}</div>{% endif %}
+                {% if complaint %}<div><strong>Скарга:</strong> {{ complaint }}</div>{% endif %}
+            </div>
+            <a href="/" class="btn">На головну</a>
+        </div>
+    </div>
+</body>
+</html>

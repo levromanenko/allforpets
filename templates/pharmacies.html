@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ветаптеки — AllForPets</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f8fdfd; color: #333; }
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: white; border-bottom: 1px solid #e0f7fa;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 24px; height: 64px;
+        }
+        .left-part { display: flex; align-items: center; gap: 14px; }
+        .logo-paw {
+            width: 36px; height: 36px; background: #00acc1;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+        }
+        .app-name { font-size: 20px; font-weight: 700; color: #00838f; }
+        .city { display: flex; align-items: center; gap: 6px; color: #00838f; font-weight: 600; }
+        .right-part { display: flex; align-items: center; gap: 16px; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: #00838f; text-decoration: none; }
+        .nav-top { display: flex; gap: 20px; align-items: center; }
+        .nav-top a { color: #00838f; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        h2 { color: #00838f; margin-bottom: 16px; }
+        .register-btn { display: inline-block; background: #00acc1; color: white; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; margin-bottom: 20px; }
+        .register-btn:hover { background: #00838f; }
+        .pharmacies-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+        .pharmacy-card { background: white; border-radius: 12px; padding: 16px; width: calc(33% - 11px); min-width: 250px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-decoration: none; color: inherit; display: flex; gap: 12px; }
+        .pharmacy-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .pharmacy-photo { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; background: #e0f7fa; flex-shrink: 0; }
+        .pharmacy-info { flex: 1; }
+        .pharmacy-name { font-weight: 700; color: #00838f; font-size: 16px; }
+        .pharmacy-meta { font-size: 13px; color: #666; margin-top: 4px; }
+        .quick-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .quick-link { background: white; border-radius: 12px; padding: 20px; text-align: center; text-decoration: none; color: #00838f; box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-weight: 600; }
+        .quick-link span { font-size: 28px; display: block; margin-bottom: 8px; }
+        @media (max-width: 800px) { .pharmacy-card { width: 100%; } .nav-top { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="left-part">
+            <div class="logo-paw">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 1c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm8 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 3c-2.2 0-4 1.8-4 4v1h8v-1c0-2.2-1.8-4-4-4z"/>
+                </svg>
+            </div>
+            <div class="app-name">AllForPets</div>
+            <div class="city">📍 Київ</div>
+        </div>
+        <div class="nav-top">
+            <a href="/">Головна</a>
+            <a href="/pets">Мої улюбленці</a>
+            <a href="/clinics">Клініки</a>
+            <a href="/search">Записатися</a>
+            <a href="/pharmacies">Ветаптеки</a>
+            <a href="#">Зоомагазини</a>
+        </div>
+        <div class="right-part">
+            {% if user %}
+            <a href="/settings" class="icon-btn">⚙️</a>
+            <a href="/logout" class="icon-btn">🚪</a>
+            {% else %}
+            <a href="/login" class="icon-btn">🔑</a>
+            <a href="/register" class="icon-btn">📝</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="/pharmacies/register" class="register-btn">Подати заяву на реєстрацію</a>
+        <h2>Партнери AllForPets</h2>
+        <div class="pharmacies-grid">
+            {% for p in pharmacies %}
+            <a href="/pharmacy/{{ p.id }}" class="pharmacy-card">
+                {% if p.photo %}
+                <img src="{{ p.photo }}" class="pharmacy-photo" alt="">
+                {% else %}
+                <div class="pharmacy-photo" style="display:flex;align-items:center;justify-content:center;font-size:28px;">💊</div>
+                {% endif %}
+                <div class="pharmacy-info">
+                    <div class="pharmacy-name">{{ p.name }}</div>
+                    {% if p.district %}<div class="pharmacy-meta">📍 {{ p.district }} район</div>{% endif %}
+                    {% if p.street %}<div class="pharmacy-meta">🗺️ {{ p.street }}</div>{% endif %}
+                    {% if p.phone %}<div class="pharmacy-meta">📞 {{ p.phone }}</div>{% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% if not pharmacies %}
+        <p style="color:#888;margin-top:20px;">Поки немає аптек-партнерів.</p>
+        {% endif %}
+    </div>
+
+    <div class="quick-links">
+        <a href="/clinics" class="quick-link"><span>🏥</span>Клініки</a>
+        <a href="/search" class="quick-link"><span>👨‍⚕️</span>Записатися до ветеринара</a>
+        <a href="/pharmacies" class="quick-link"><span>💊</span>Ветаптеки</a>
+        <a href="#" class="quick-link"><span>🛒</span>Зоомагазини</a>
+    </div>
+</body>
+</html>
